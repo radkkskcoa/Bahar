@@ -1,0 +1,16 @@
+node_modules/
+dist/
+build/
+coverage/
+
+.env
+.env.local
+.env.*.local
+# The committed defaults file is required for the sandbox stack to boot.
+!.env.base44-defaults
+
+*.log
+npm-debug.log*
+.DS_Store
+.vscode/
+.idea/

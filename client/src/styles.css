@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --brand: #ff650d;
+    --lime: #c7f32f;
+    --page: #080808;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    @apply bg-base text-ink font-sans antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Persian gets a proper RTL reading experience, not just mirrored text. */
+  html[dir='rtl'] body {
+    font-family: Vazirmatn, Inter, system-ui, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display tracking-tight;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand ring-offset-2 ring-offset-base;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-10;
+  }
+
+  .card {
+    @apply rounded-2xl border border-line bg-card shadow-card;
+  }
+
+  .btn {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold
+           transition duration-200 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply btn bg-brand text-white hover:bg-brand-hover active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    @apply btn border border-line bg-elevate text-ink hover:border-brand/60 hover:text-white;
+  }
+
+  .btn-lime {
+    @apply btn bg-lime text-base hover:bg-lime-deep;
+  }
+
+  .btn-sm {
+    @apply min-h-[36px] px-3.5 text-xs;
+  }
+
+  .icon-btn {
+    @apply relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-line bg-elevate
+           text-ink-soft transition hover:border-brand/60 hover:text-white;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-elevate px-3 py-1.5 text-xs
+           font-medium text-ink-soft transition hover:text-white;
+  }
+
+  .chip-active {
+    @apply border-brand bg-brand text-white hover:text-white;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider;
+  }
+
+  .field {
+    @apply w-full rounded-xl border border-line bg-elevate px-4 py-3 text-sm text-ink placeholder:text-ink-muted
+           focus:border-brand focus:outline-none;
+  }
+
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-ink-muted;
+  }
+
+  .section-head {
+    @apply mb-4 flex items-end justify-between gap-4;
+  }
+
+  .section-title {
+    @apply flex items-center gap-2 text-xl font-extrabold sm:text-2xl;
+  }
+
+  .link-more {
+    @apply shrink-0 text-sm font-semibold text-brand hover:text-brand-hover;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden rounded-xl bg-elevate;
+  }
+
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/5 to-transparent;
+    animation: shimmer 1.4s infinite;
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}

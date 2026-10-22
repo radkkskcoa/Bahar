@@ -1,0 +1,114 @@
+# Crunch House — sandbox runbook.
+#
+# Runs the app from the cloned source (never a prebuilt image): the repository is
+# bind-mounted into plain node:22 containers, dependencies are installed into named
+# volumes on startup, and every app service runs a live-reload dev command.
+#
+#   web   → Vite dev server on host port 3000 (the preview entry point)
+#   api   → Express API on host port 8000, proxied by Vite at /api (single origin)
+#   db    → PostgreSQL 16, plain infrastructure with a healthcheck
+#   migrate → one-shot schema + seed, exits before the API starts
+name: crunch-house
+
+services:
+  db:
+    image: postgres:16
+    restart: on-failure
+    environment:
+      POSTGRES_USER: crunch
+      POSTGRES_PASSWORD: crunch_local_dev
+      POSTGRES_DB: crunch_house
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crunch -d crunch_house"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # One-shot: applies the schema and seeds demo data, then exits.
+  migrate:
+    image: node:22
+    working_dir: /repo/server
+    volumes:
+      - ./:/repo
+      - server_modules:/repo/server/node_modules
+    environment:
+      DATABASE_URL: postgres://crunch:crunch_local_dev@db:5432/crunch_house
+    command: ["sh", "-ec", "cd /repo/server && npm install --no-audit --no-fund && node src/migrate.js"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    image: node:22
+    restart: on-failure
+    working_dir: /repo/server
+    labels:
+      base44.project: "Crunch House API"
+      base44.kind: "api"
+      base44.port: "8000"
+      base44.docs: "/api/health"
+    # Defaults first, platform-delivered secrets last so a dashboard value always wins.
+    env_file:
+      - ./.env.base44-defaults
+      - path: /run/base44/app.env
+        required: false
+    environment:
+      DATABASE_URL: postgres://crunch:crunch_local_dev@db:5432/crunch_house
+      PORT: "4000"
+      # Direct API access from the public preview host (the storefront uses the Vite proxy).
+      ALLOWED_ORIGINS: https://3000-${BASE44_PUBLIC_HOST_SUFFIX}
+    ports:
+      - "8000:4000"
+    volumes:
+      - ./:/repo
+      - server_modules:/repo/server/node_modules
+    command: ["sh", "-ec", "cd /repo/server && npm install --no-audit --no-fund && exec node --watch src/index.js"]
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", 'node -e "fetch(''http://127.0.0.1:4000/api/health'').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"']
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 40s
+
+  web:
+    image: node:22
+    restart: on-failure
+    working_dir: /repo/client
+    labels:
+      base44.project: "Crunch House"
+      base44.kind: "web"
+      base44.port: "3000"
+    environment:
+      # Passed through bare: Vite appends this to its allowed hosts for the preview proxy.
+      - __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
+      # Sandbox-only host allowlist extension, gated on the preview flag in vite.config.js.
+      - BASE44_PREVIEW_MODE
+      - BASE44_SANDBOX_HOST_DOMAIN
+      - API_PROXY_TARGET=http://api:4000
+    ports:
+      - "3000:5173"
+    volumes:
+      - ./:/repo
+      - client_modules:/repo/client/node_modules
+    command: ["sh", "-ec", "cd /repo/client && npm install --no-audit --no-fund && exec npm run dev -- --host 0.0.0.0"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", 'node -e "fetch(''http://127.0.0.1:5173/'').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+volumes:
+  db_data:
+  server_modules:
+  client_modules:
