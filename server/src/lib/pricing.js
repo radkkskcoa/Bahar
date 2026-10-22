@@ -39,7 +39,7 @@ async function loadCartRecords(items) {
   const groupIds = groups.map((g) => g.id);
   const { rows: optionItems } = groupIds.length
     ? await q(`SELECT * FROM option_item WHERE group_id = ANY($1::int[]) ORDER BY sort`, [groupIds])
-    : [];
+    : { rows: [] };
   return { products, groups, optionItems };
 }
 

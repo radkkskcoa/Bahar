@@ -70,7 +70,7 @@ router.get('/products/:slug', async (req, res, next) => {
     const groupIds = groups.map((g) => g.id);
     const { rows: items } = groupIds.length
       ? await q(`SELECT * FROM option_item WHERE group_id = ANY($1::int[]) ORDER BY sort`, [groupIds])
-      : [];
+      : { rows: [] };
     res.json({
       ...rows[0],
       option_groups: groups.map((g) => ({ ...g, items: items.filter((i) => i.group_id === g.id) })),
