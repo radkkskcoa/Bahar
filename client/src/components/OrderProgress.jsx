@@ -14,13 +14,13 @@ const TIMESTAMP_FIELD = {
 
 /** Status-based progress. Steps are real order states — no simulated courier GPS. */
 export default function OrderProgress({ status, fulfillment = 'delivery', order = {} }) {
-  const { locale } = useI18n();
-  const steps = orderSteps(fulfillment);
+  const { t, locale } = useI18n();
+  const steps = orderSteps(fulfillment, t);
   const current = statusIndex(status, fulfillment);
   const cancelled = status === 'cancelled';
 
   return (
-    <ol className="flex flex-col gap-4 sm:flex-row sm:gap-2" aria-label="Order progress">
+    <ol className="flex flex-col gap-4 sm:flex-row sm:gap-2" aria-label={t('common.orderProgress')}>
       {steps.map((step, index) => {
         const done = !cancelled && index < current;
         const active = !cancelled && index === current;
@@ -56,7 +56,7 @@ export default function OrderProgress({ status, fulfillment = 'delivery', order 
                 <span className="block text-[11px] text-ink-muted">{formatDate(stamp, locale)}</span>
               ) : null}
             </span>
-            {active ? <span className="sr-only">Current status</span> : null}
+            {active ? <span className="sr-only">{t('common.currentStatus')}</span> : null}
           </li>
         );
       })}

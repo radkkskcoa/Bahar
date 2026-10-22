@@ -13,7 +13,7 @@ export default function CartPage() {
     <div className="container-page py-6">
       <header className="mb-6">
         <h1 className="text-3xl font-extrabold sm:text-4xl">{t('cart.title')}</h1>
-        <p className="text-sm text-ink-muted">{count} item{count === 1 ? '' : 's'}</p>
+        <p className="text-sm text-ink-muted">{t(count === 1 ? 'common.itemCount' : 'common.itemsCount', { count })}</p>
       </header>
 
       {items.length === 0 ? (

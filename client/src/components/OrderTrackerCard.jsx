@@ -51,10 +51,8 @@ export default function OrderTrackerCard() {
           </h2>
           <StatusPill status="confirmed" />
         </header>
-        <p className="text-sm text-ink-soft">
-          Track any order with its order number. Sign in to see your orders here automatically.
-        </p>
-        <Link to="/track" className="btn-primary w-fit">Track an order</Link>
+        <p className="text-sm text-ink-soft">{t('track.signedOutBody')}</p>
+        <Link to="/track" className="btn-primary w-fit">{t('track.trackCta')}</Link>
       </section>
     );
   }
@@ -72,19 +70,21 @@ export default function OrderTrackerCard() {
       {order ? (
         <>
           <p className="text-sm text-ink-soft">
-            Order <span className="font-bold text-ink">{order.order_number}</span> · Estimated{' '}
-            {etaLabel(delivery.eta_minutes, locale)} (estimate)
+            {t('track.activeOrder', {
+              number: order.order_number,
+              eta: etaLabel(delivery.eta_minutes, locale, t),
+            })}
           </p>
           <OrderProgress status={order.status} fulfillment={order.fulfillment} order={order} />
-          <Link to={`/track/${order.order_number}`} className="btn-ghost w-fit">Track order</Link>
+          <Link to={`/track/${order.order_number}`} className="btn-ghost w-fit">{t('track.trackThis')}</Link>
         </>
       ) : (
         <>
           <p className="flex items-center gap-2 text-sm text-ink-soft">
             <PackageSearch className="h-4 w-4 text-lime" aria-hidden="true" />
-            No active orders right now.
+            {t('track.noneActive')}
           </p>
-          <Link to="/menu" className="btn-primary w-fit">Browse the menu</Link>
+          <Link to="/menu" className="btn-primary w-fit">{t('cart.browseMenu')}</Link>
         </>
       )}
     </section>

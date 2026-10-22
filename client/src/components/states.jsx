@@ -1,4 +1,5 @@
 import { AlertTriangle, RefreshCw, SearchX } from 'lucide-react';
+import { useI18n } from '../context/I18nContext.jsx';
 
 export function LoadingSkeleton({ className = 'h-32 w-full' }) {
   return <div className={`skeleton ${className}`} aria-hidden="true" />;
@@ -48,18 +49,19 @@ export function EmptyState({ icon, title, description, action }) {
   );
 }
 
-export function ErrorState({ message, onRetry, title = 'Something went wrong' }) {
+export function ErrorState({ message, onRetry, title }) {
+  const { t } = useI18n();
   return (
     <div className="card flex flex-col items-center gap-3 px-6 py-12 text-center" role="alert">
       <span className="grid h-14 w-14 place-items-center rounded-full border border-danger/40 bg-danger/10 text-danger">
         <AlertTriangle className="h-6 w-6" aria-hidden="true" />
       </span>
-      <h3 className="text-lg font-bold">{title}</h3>
+      <h3 className="text-lg font-bold">{title ?? t('common.errorTitle')}</h3>
       <p className="max-w-md text-sm text-ink-muted">{message}</p>
       {onRetry ? (
         <button type="button" className="btn-ghost" onClick={onRetry}>
           <RefreshCw className="h-4 w-4" aria-hidden="true" />
-          Try again
+          {t('common.retry')}
         </button>
       ) : null}
     </div>

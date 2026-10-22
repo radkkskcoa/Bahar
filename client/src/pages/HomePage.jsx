@@ -51,7 +51,7 @@ export default function HomePage() {
   if (status === 'error') {
     return (
       <div className="container-page py-10">
-        <ErrorState message={error} onRetry={reload} title="We could not load the menu" />
+        <ErrorState message={error} onRetry={reload} title={t('home.loadError')} />
       </div>
     );
   }
@@ -67,7 +67,7 @@ export default function HomePage() {
         onOpenFilters={() => navigate('/menu?filters=open')}
       />
 
-      <section aria-label="Categories">
+      <section aria-label={t('home.categories')}>
         <CategoryScroller
           categories={categories.filter((category) => category.slug !== 'bundles')}
           activeSlug={null}
@@ -114,7 +114,7 @@ export default function HomePage() {
           <SectionHeader
             icon={<Flame className="h-5 w-5" aria-hidden="true" />}
             title={t('home.chefSpecials')}
-            subtitle="Made with love by our chefs"
+            subtitle={t('home.chefSpecialsSub')}
           />
           <div className="grid gap-5 lg:grid-cols-2">
             {chefSpecial ? <ChefSpecialCard product={chefSpecial} onOpen={setOpenProduct} /> : null}
@@ -137,10 +137,10 @@ export default function HomePage() {
         />
       </section>
 
-      <section aria-label="Popular dishes">
+      <section aria-label={t('home.popular')}>
         <SectionHeader
-          title="Popular right now"
-          subtitle="Straight from the kitchen"
+          title={t('home.popular')}
+          subtitle={t('home.popularSub')}
           action={<Link to="/menu" className="link-more">{t('home.viewAll')} <ArrowRight className="inline h-3.5 w-3.5 rtl:rotate-180" aria-hidden="true" /></Link>}
         />
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">

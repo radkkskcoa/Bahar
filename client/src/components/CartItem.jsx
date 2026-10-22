@@ -24,7 +24,7 @@ export default function CartItem({ item }) {
               </p>
             ) : null}
             {item.notes ? <p className="mt-0.5 text-[11px] italic text-ink-muted">“{item.notes}”</p> : null}
-            <p className="mt-1 text-xs text-ink-muted">{money(unit)} each</p>
+            <p className="mt-1 text-xs text-ink-muted">{money(unit)} {t('common.each')}</p>
           </div>
           <button
             type="button"
@@ -41,7 +41,7 @@ export default function CartItem({ item }) {
             value={item.quantity}
             min={0}
             onChange={(next) => setQuantity(item.key, next)}
-            label={`${item.name} quantity`}
+            label={`${item.name} — ${t('common.qty')}`}
           />
           <span className="text-sm font-extrabold text-brand">{money(unit * item.quantity)}</span>
         </div>

@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useCatalog } from '../context/CatalogContext.jsx';
 import { useDestination } from '../context/DestinationContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
+import { useI18n } from '../context/I18nContext.jsx';
 
 /** Delivery destination picker: saved addresses for members, free entry for guests. */
 export default function LocationModal({ open, onClose }) {
@@ -13,6 +14,7 @@ export default function LocationModal({ open, onClose }) {
   const { delivery } = useCatalog();
   const { destination, setDestination } = useDestination();
   const { toast } = useToast();
+  const { t } = useI18n();
   const [saved, setSaved] = useState([]);
   const [form, setForm] = useState(destination);
   const [error, setError] = useState(null);
@@ -26,11 +28,12 @@ export default function LocationModal({ open, onClose }) {
 
   const save = () => {
     if (!form.line1?.trim() || !form.city?.trim()) {
-      setError('Please add a street address and a city so we know where to deliver.');
+      setError(t('location.missing'));
       return;
     }
-    setDestination({ ...form, label: form.label?.trim() || 'Home' });
-    toast({ title: 'Delivery destination updated', body: `${form.label || 'Home'} · ${form.city}`, tone: 'success' });
+    const label = form.label?.trim() || t('location.labelPlaceholder');
+    setDestination({ ...form, label });
+    toast({ title: t('location.updated'), body: `${label} · ${form.city}`, tone: 'success' });
     onClose();
   };
 
@@ -38,20 +41,20 @@ export default function LocationModal({ open, onClose }) {
     <Modal
       open={open}
       onClose={onClose}
-      title="Where should we deliver?"
-      description="Pick a saved address or enter a new one."
+      title={t('location.title')}
+      description={t('location.description')}
       size="sm"
       footer={
         <div className="flex gap-3">
-          <button type="button" className="btn-ghost flex-1" onClick={onClose}>Cancel</button>
-          <button type="button" className="btn-primary flex-1" onClick={save}>Save destination</button>
+          <button type="button" className="btn-ghost flex-1" onClick={onClose}>{t('common.cancel')}</button>
+          <button type="button" className="btn-primary flex-1" onClick={save}>{t('location.save')}</button>
         </div>
       }
     >
       <div className="space-y-4">
         {saved.length ? (
           <div className="space-y-2">
-            <p className="label mb-0">Saved addresses</p>
+            <p className="label mb-0">{t('location.savedAddresses')}</p>
             {saved.map((address) => (
               <button
                 key={address.id}
@@ -83,24 +86,24 @@ export default function LocationModal({ open, onClose }) {
 
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
-            <label className="label" htmlFor="dest-label">Label</label>
+            <label className="label" htmlFor="dest-label">{t('location.label')}</label>
             <input
               id="dest-label"
               className="field"
               value={form.label ?? ''}
               onChange={(event) => setForm({ ...form, label: event.target.value })}
-              placeholder="Home"
+              placeholder={t('location.labelPlaceholder')}
             />
           </div>
           <div>
-            <label className="label" htmlFor="dest-zone">Zone</label>
+            <label className="label" htmlFor="dest-zone">{t('location.zone')}</label>
             <select
               id="dest-zone"
               className="field"
               value={form.zone ?? ''}
               onChange={(event) => setForm({ ...form, zone: event.target.value })}
             >
-              <option value="">Select a zone</option>
+              <option value="">{t('location.zoneSelect')}</option>
               {(delivery.zones ?? []).map((zone) => (
                 <option key={zone} value={zone}>{zone}</option>
               ))}
@@ -109,19 +112,19 @@ export default function LocationModal({ open, onClose }) {
         </div>
 
         <div>
-          <label className="label" htmlFor="dest-line1">Street address</label>
+          <label className="label" htmlFor="dest-line1">{t('location.street')}</label>
           <input
             id="dest-line1"
             className="field"
             value={form.line1 ?? ''}
             onChange={(event) => setForm({ ...form, line1: event.target.value })}
-            placeholder="42 Crispy Lane"
+            placeholder={t('location.streetPlaceholder')}
           />
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
-            <label className="label" htmlFor="dest-line2">Apartment / unit</label>
+            <label className="label" htmlFor="dest-line2">{t('location.unit')}</label>
             <input
               id="dest-line2"
               className="field"
@@ -130,7 +133,7 @@ export default function LocationModal({ open, onClose }) {
             />
           </div>
           <div>
-            <label className="label" htmlFor="dest-city">City</label>
+            <label className="label" htmlFor="dest-city">{t('location.city')}</label>
             <input
               id="dest-city"
               className="field"
@@ -142,7 +145,7 @@ export default function LocationModal({ open, onClose }) {
 
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
-            <label className="label" htmlFor="dest-postal">Postal code</label>
+            <label className="label" htmlFor="dest-postal">{t('location.postal')}</label>
             <input
               id="dest-postal"
               className="field"
@@ -151,13 +154,13 @@ export default function LocationModal({ open, onClose }) {
             />
           </div>
           <div>
-            <label className="label" htmlFor="dest-notes">Delivery instructions</label>
+            <label className="label" htmlFor="dest-notes">{t('location.instructions')}</label>
             <input
               id="dest-notes"
               className="field"
               value={form.instructions ?? ''}
               onChange={(event) => setForm({ ...form, instructions: event.target.value })}
-              placeholder="Ring the green doorbell"
+              placeholder={t('location.instructionsPlaceholder')}
             />
           </div>
         </div>

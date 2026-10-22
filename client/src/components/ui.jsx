@@ -1,4 +1,5 @@
 import { Minus, Plus, Star } from 'lucide-react';
+import { useI18n } from '../context/I18nContext.jsx';
 
 export function SectionHeader({ icon, title, subtitle, action }) {
   return (
@@ -38,15 +39,20 @@ export function RatingStars({ value, count }) {
   );
 }
 
-export function QtyStepper({ value, onChange, min = 1, max = 20, label = 'Quantity' }) {
+export function QtyStepper({ value, onChange, min = 1, max = 20, label }) {
+  const { t } = useI18n();
   return (
-    <div className="inline-flex items-center gap-1 rounded-full border border-line bg-elevate p-1" role="group" aria-label={label}>
+    <div
+      className="inline-flex items-center gap-1 rounded-full border border-line bg-elevate p-1"
+      role="group"
+      aria-label={label ?? t('common.qty')}
+    >
       <button
         type="button"
         className="grid h-9 w-9 place-items-center rounded-full text-ink-soft transition hover:bg-base hover:text-white disabled:opacity-40"
         onClick={() => onChange(value - 1)}
         disabled={value <= min}
-        aria-label="Decrease quantity"
+        aria-label={t('common.decreaseQty')}
       >
         <Minus className="h-4 w-4" aria-hidden="true" />
       </button>
@@ -56,7 +62,7 @@ export function QtyStepper({ value, onChange, min = 1, max = 20, label = 'Quanti
         className="grid h-9 w-9 place-items-center rounded-full text-ink-soft transition hover:bg-base hover:text-white disabled:opacity-40"
         onClick={() => onChange(value + 1)}
         disabled={value >= max}
-        aria-label="Increase quantity"
+        aria-label={t('common.increaseQty')}
       >
         <Plus className="h-4 w-4" aria-hidden="true" />
       </button>
@@ -65,30 +71,25 @@ export function QtyStepper({ value, onChange, min = 1, max = 20, label = 'Quanti
 }
 
 export function StatusPill({ status }) {
-  const map = {
-    confirmed: { tone: 'muted', label: 'Confirmed' },
-    preparing: { tone: 'warn', label: 'Preparing' },
-    ready: { tone: 'lime', label: 'Ready' },
-    on_the_way: { tone: 'brand', label: 'On the way' },
-    delivered: { tone: 'success', label: 'Delivered' },
-    cancelled: { tone: 'danger', label: 'Cancelled' },
+  const { t } = useI18n();
+  const tones = {
+    confirmed: 'muted',
+    preparing: 'warn',
+    ready: 'lime',
+    on_the_way: 'brand',
+    delivered: 'success',
+    cancelled: 'danger',
   };
-  const entry = map[status] ?? map.confirmed;
-  return <Badge tone={entry.tone}>{entry.label}</Badge>;
+  return <Badge tone={tones[status] ?? tones.confirmed}>{t(`status.${status}`)}</Badge>;
 }
 
 export function PaymentPill({ status, mode }) {
-  const labels = {
-    pending: 'Payment pending',
-    test_paid: 'Paid (test mode)',
-    paid: 'Paid',
-    failed: 'Payment failed',
-  };
+  const { t } = useI18n();
   const tone = status === 'paid' || status === 'test_paid' ? 'success' : status === 'failed' ? 'danger' : 'warn';
   return (
     <Badge tone={tone}>
-      {labels[status] ?? status}
-      {mode === 'test' ? ' · test' : ''}
+      {t(`payment.${status}`)}
+      {mode === 'test' ? ` ${t('payment.testSuffix')}` : ''}
     </Badge>
   );
 }

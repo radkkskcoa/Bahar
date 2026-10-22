@@ -1,5 +1,6 @@
 import { AlertTriangle, CheckCircle2, Info, X } from 'lucide-react';
 import { useToast } from '../context/ToastContext.jsx';
+import { useI18n } from '../context/I18nContext.jsx';
 
 const TONES = {
   success: { icon: CheckCircle2, className: 'border-success/40 text-success' },
@@ -9,6 +10,7 @@ const TONES = {
 
 export default function ToastHost() {
   const { toasts, dismiss } = useToast();
+  const { t } = useI18n();
   if (!toasts.length) return null;
 
   return (
@@ -40,7 +42,7 @@ export default function ToastHost() {
               type="button"
               onClick={() => dismiss(toast.id)}
               className="rounded-lg p-1 text-ink-muted transition hover:text-white"
-              aria-label="Dismiss notification"
+              aria-label={t('common.dismiss')}
             >
               <X className="h-3.5 w-3.5" aria-hidden="true" />
             </button>

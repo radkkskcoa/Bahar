@@ -32,7 +32,7 @@ export default function AccountPage() {
   const [error, setError] = useState(null);
   const [orders, setOrders] = useState([]);
   const [addresses, setAddresses] = useState([]);
-  const [newAddress, setNewAddress] = useState({ label: 'Home', line1: '', city: '', postal_code: '', instructions: '' });
+  const [newAddress, setNewAddress] = useState({ label: '', line1: '', city: '', postal_code: '', instructions: '' });
   const [openProduct, setOpenProduct] = useState(null);
   const { setDestination } = useDestination();
   const { favorites } = useAuth();
@@ -69,21 +69,25 @@ export default function AccountPage() {
     event.preventDefault();
     try {
       await updateProfile({ name: form.name || user.name, phone: form.phone || user.phone });
-      toast({ title: 'Profile updated', tone: 'success' });
+      toast({ title: t('toast.profileUpdated'), tone: 'success' });
     } catch (err) {
-      toast({ title: 'Could not save profile', body: err.message, tone: 'error' });
+      toast({ title: t('toast.profileError'), body: err.message, tone: 'error' });
     }
   };
 
   const addAddress = async (event) => {
     event.preventDefault();
     try {
-      const created = await authApi.addAddress({ ...newAddress, is_default: addresses.length === 0 });
+      const created = await authApi.addAddress({
+        ...newAddress,
+        label: newAddress.label.trim() || t('location.labelPlaceholder'),
+        is_default: addresses.length === 0,
+      });
       setAddresses((current) => [...current, created]);
-      setNewAddress({ label: 'Home', line1: '', city: '', postal_code: '', instructions: '' });
-      toast({ title: 'Address saved', tone: 'success' });
+      setNewAddress({ label: '', line1: '', city: '', postal_code: '', instructions: '' });
+      toast({ title: t('toast.addressSaved'), tone: 'success' });
     } catch (err) {
-      toast({ title: 'Could not save address', body: err.message, tone: 'error' });
+      toast({ title: t('toast.addressError'), body: err.message, tone: 'error' });
     }
   };
 
@@ -91,9 +95,9 @@ export default function AccountPage() {
     try {
       await authApi.removeAddress(id);
       setAddresses((current) => current.filter((address) => address.id !== id));
-      toast({ title: 'Address removed', tone: 'info' });
+      toast({ title: t('toast.addressRemoved'), tone: 'info' });
     } catch (err) {
-      toast({ title: 'Could not remove address', body: err.message, tone: 'error' });
+      toast({ title: t('toast.addressRemoveError'), body: err.message, tone: 'error' });
     }
   };
 
@@ -104,12 +108,10 @@ export default function AccountPage() {
         <div className="card mx-auto max-w-md space-y-5 p-7">
           <header className="space-y-1 text-center">
             <h1 className="text-2xl font-extrabold">
-              {mode === 'signin' ? 'Welcome back' : 'Create your account'}
+              {mode === 'signin' ? t('account.welcomeBack') : t('account.createAccount')}
             </h1>
             <p className="text-sm text-ink-muted">
-              {mode === 'signin'
-                ? 'Sign in to see your orders, favourites and Crunch points.'
-                : 'Join Crunch House and start earning rewards on every order.'}
+              {mode === 'signin' ? t('account.signInBody') : t('account.signUpBody')}
             </p>
           </header>
 
@@ -125,7 +127,7 @@ export default function AccountPage() {
                   mode === value ? 'bg-brand text-white' : 'text-ink-muted hover:text-white'
                 }`}
               >
-                {value === 'signin' ? 'Sign in' : 'Sign up'}
+                {value === 'signin' ? t('account.signInTab') : t('account.signUpTab')}
               </button>
             ))}
           </div>
@@ -133,22 +135,22 @@ export default function AccountPage() {
           <form className="space-y-4" onSubmit={submitAuth}>
             {mode === 'signup' ? (
               <div>
-                <label className="label" htmlFor="acc-name">Full name</label>
+                <label className="label" htmlFor="acc-name">{t('account.fullName')}</label>
                 <input id="acc-name" className="field" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} autoComplete="name" required />
               </div>
             ) : null}
             <div>
-              <label className="label" htmlFor="acc-email">Email</label>
+              <label className="label" htmlFor="acc-email">{t('account.email')}</label>
               <input id="acc-email" type="email" className="field" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} autoComplete="email" required />
             </div>
             <div>
-              <label className="label" htmlFor="acc-password">Password</label>
+              <label className="label" htmlFor="acc-password">{t('account.password')}</label>
               <input id="acc-password" type="password" className="field" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} minLength={8} required />
-              {mode === 'signup' ? <p className="mt-1 text-xs text-ink-muted">At least 8 characters.</p> : null}
+              {mode === 'signup' ? <p className="mt-1 text-xs text-ink-muted">{t('account.passwordHint')}</p> : null}
             </div>
             {mode === 'signup' ? (
               <div>
-                <label className="label" htmlFor="acc-phone">Phone (optional)</label>
+                <label className="label" htmlFor="acc-phone">{t('account.phoneOptional')}</label>
                 <input id="acc-phone" className="field" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} autoComplete="tel" />
               </div>
             ) : null}
@@ -156,14 +158,14 @@ export default function AccountPage() {
             {error ? <p className="text-sm text-danger" role="alert">{error}</p> : null}
 
             <button type="submit" className="btn-primary w-full" disabled={busy}>
-              {mode === 'signin' ? 'Sign in' : 'Create account'}
+              {mode === 'signin' ? t('account.signInTab') : t('account.createCta')}
             </button>
           </form>
 
           <div className="rounded-xl border border-line bg-elevate px-4 py-3 text-xs text-ink-muted">
-            <p className="font-semibold text-ink-soft">Demonstration accounts</p>
-            <p>Customer: demo@crunchhouse.local / Crunch123!</p>
-            <p>Admin: admin@crunchhouse.local / Crunch123!</p>
+            <p className="font-semibold text-ink-soft">{t('account.demoAccounts')}</p>
+            <p>{t('account.demoCustomer')} demo@crunchhouse.local / Crunch123!</p>
+            <p>{t('account.demoAdmin')} admin@crunchhouse.local / Crunch123!</p>
           </div>
         </div>
       </div>
@@ -177,7 +179,7 @@ export default function AccountPage() {
     <div className="container-page space-y-10 py-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold sm:text-4xl">Hi, {user.name.split(' ')[0]}</h1>
+          <h1 className="text-3xl font-extrabold sm:text-4xl">{t('account.hi', { name: user.name.split(' ')[0] })}</h1>
           <p className="text-sm text-ink-muted">{user.email}</p>
         </div>
         <button type="button" className="btn-ghost" onClick={logout}>
@@ -188,20 +190,20 @@ export default function AccountPage() {
 
       <section className="grid gap-6 lg:grid-cols-2">
         <form className="card space-y-4 p-6" onSubmit={saveProfile}>
-          <SectionHeader icon={<User className="h-5 w-5" aria-hidden="true" />} title="Profile" subtitle="Keep your contact details current" />
+          <SectionHeader icon={<User className="h-5 w-5" aria-hidden="true" />} title={t('account.profile')} subtitle={t('account.profileSub')} />
           <div>
-            <label className="label" htmlFor="pf-name">Name</label>
+            <label className="label" htmlFor="pf-name">{t('account.name')}</label>
             <input id="pf-name" className="field" defaultValue={user.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           </div>
           <div>
-            <label className="label" htmlFor="pf-phone">Phone</label>
+            <label className="label" htmlFor="pf-phone">{t('account.phone')}</label>
             <input id="pf-phone" className="field" defaultValue={user.phone ?? ''} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
           </div>
-          <button type="submit" className="btn-primary">Save changes</button>
+          <button type="submit" className="btn-primary">{t('account.saveChanges')}</button>
         </form>
 
         <section className="card space-y-4 p-6">
-          <SectionHeader icon={<Heart className="h-5 w-5" aria-hidden="true" />} title="Crunch points" subtitle="Earned on delivered orders" />
+          <SectionHeader icon={<Heart className="h-5 w-5" aria-hidden="true" />} title={t('account.pointsTitle')} subtitle={t('account.pointsSub')} />
           {loyalty.loading ? (
             <LoadingSkeleton className="h-16 w-full" />
           ) : (
@@ -209,10 +211,13 @@ export default function AccountPage() {
               <p className="text-3xl font-extrabold text-lime">{loyalty.points.toLocaleString(locale)}</p>
               {loyalty.nextReward ? (
                 <p className="text-sm text-ink-muted">
-                  Next reward: {loyalty.nextReward.name} at {loyalty.nextReward.points_cost.toLocaleString(locale)} points
+                  {t('account.nextReward', {
+                    name: loyalty.nextReward.name,
+                    points: loyalty.nextReward.points_cost.toLocaleString(locale),
+                  })}
                 </p>
               ) : null}
-              <Link to="/rewards" className="btn-ghost w-fit">View rewards</Link>
+              <Link to="/rewards" className="btn-ghost w-fit">{t('account.viewRewards')}</Link>
             </>
           )}
         </section>
@@ -221,15 +226,15 @@ export default function AccountPage() {
       <section aria-labelledby="orders-heading">
         <SectionHeader
           icon={<Package className="h-5 w-5" aria-hidden="true" />}
-          title="Order history"
-          subtitle="Track anything that is still on its way"
+          title={t('account.orderHistory')}
+          subtitle={t('account.orderHistorySub')}
         />
         {orders.length === 0 ? (
           <EmptyState
             icon={<Package className="h-6 w-6" aria-hidden="true" />}
-            title="No orders yet"
-            description="When you place an order it will appear here with live status updates."
-            action={<Link to="/menu" className="btn-primary">Browse the menu</Link>}
+            title={t('account.noOrders')}
+            description={t('account.noOrdersBody')}
+            action={<Link to="/menu" className="btn-primary">{t('cart.browseMenu')}</Link>}
           />
         ) : (
           <ul className="card divide-y divide-line">
@@ -238,33 +243,39 @@ export default function AccountPage() {
                 <div>
                   <p className="text-sm font-bold">{order.order_number}</p>
                   <p className="text-xs text-ink-muted">
-                    {formatDate(order.created_at, locale)} · {order.items.length} item{order.items.length === 1 ? '' : 's'} · {money(order.total_cents)}
+                    {t('account.orderMeta', {
+                      date: formatDate(order.created_at, locale),
+                      count: order.items.length === 1
+                        ? t('common.itemCount', { count: order.items.length })
+                        : t('common.itemsCount', { count: order.items.length }),
+                      total: money(order.total_cents),
+                    })}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
                   <StatusPill status={order.status} />
-                  <Link to={`/track/${order.order_number}`} className="link-more">Track →</Link>
+                  <Link to={`/track/${order.order_number}`} className="link-more">{t('account.trackLink')} →</Link>
                 </div>
               </li>
             ))}
           </ul>
         )}
-        <span id="orders-heading" className="sr-only">Order history</span>
+        <span id="orders-heading" className="sr-only">{t('account.orderHistory')}</span>
       </section>
 
       <section aria-labelledby="addresses-heading">
-        <SectionHeader icon={<MapPin className="h-5 w-5" aria-hidden="true" />} title="Saved addresses" subtitle="Faster checkout next time" />
+        <SectionHeader icon={<MapPin className="h-5 w-5" aria-hidden="true" />} title={t('account.addresses')} subtitle={t('account.addressesSub')} />
         <div className="grid gap-6 lg:grid-cols-2">
           <ul className="space-y-3">
             {addresses.length === 0 ? (
-              <li className="text-sm text-ink-muted">No saved addresses yet.</li>
+              <li className="text-sm text-ink-muted">{t('account.noAddresses')}</li>
             ) : (
               addresses.map((address) => (
                 <li key={address.id} className="card flex items-start justify-between gap-3 p-4">
                   <div>
                     <p className="flex items-center gap-2 text-sm font-bold">
                       {address.label}
-                      {address.is_default ? <Badge tone="lime">Default</Badge> : null}
+                      {address.is_default ? <Badge tone="lime">{t('account.default')}</Badge> : null}
                     </p>
                     <p className="text-xs text-ink-muted">
                       {address.line1}{address.line2 ? `, ${address.line2}` : ''} · {address.city} {address.postal_code ?? ''}
@@ -274,18 +285,18 @@ export default function AccountPage() {
                     <button
                       type="button"
                       className="icon-btn h-9 w-9"
-                      aria-label={`Use ${address.label} for delivery`}
+                      aria-label={t('account.useAddress', { label: address.label })}
                       onClick={() => {
                         setDestination({
                           label: address.label, line1: address.line1, line2: address.line2 ?? '',
                           city: address.city, postal_code: address.postal_code ?? '', instructions: address.instructions ?? '',
                         });
-                        toast({ title: `Delivering to ${address.label}`, tone: 'success' });
+                        toast({ title: t('toast.deliveringTo', { label: address.label }), tone: 'success' });
                       }}
                     >
                       <MapPin className="h-4 w-4" aria-hidden="true" />
                     </button>
-                    <button type="button" className="icon-btn h-9 w-9 hover:border-danger/60 hover:text-danger" aria-label={`Delete ${address.label}`} onClick={() => removeAddress(address.id)}>
+                    <button type="button" className="icon-btn h-9 w-9 hover:border-danger/60 hover:text-danger" aria-label={t('account.deleteAddress', { label: address.label })} onClick={() => removeAddress(address.id)}>
                       <Trash2 className="h-4 w-4" aria-hidden="true" />
                     </button>
                   </div>
@@ -295,39 +306,39 @@ export default function AccountPage() {
           </ul>
 
           <form className="card space-y-3 p-5" onSubmit={addAddress}>
-            <h3 className="text-sm font-bold">Add an address</h3>
+            <h3 className="text-sm font-bold">{t('account.addAddress')}</h3>
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
-                <label className="label" htmlFor="ad-label">Label</label>
-                <input id="ad-label" className="field" value={newAddress.label} onChange={(e) => setNewAddress({ ...newAddress, label: e.target.value })} />
+                <label className="label" htmlFor="ad-label">{t('account.label')}</label>
+                <input id="ad-label" className="field" value={newAddress.label} onChange={(e) => setNewAddress({ ...newAddress, label: e.target.value })} placeholder={t('location.labelPlaceholder')} />
               </div>
               <div>
-                <label className="label" htmlFor="ad-city">City</label>
+                <label className="label" htmlFor="ad-city">{t('account.city')}</label>
                 <input id="ad-city" className="field" value={newAddress.city} onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })} required />
               </div>
             </div>
             <div>
-              <label className="label" htmlFor="ad-line1">Street address</label>
+              <label className="label" htmlFor="ad-line1">{t('account.street')}</label>
               <input id="ad-line1" className="field" value={newAddress.line1} onChange={(e) => setNewAddress({ ...newAddress, line1: e.target.value })} required />
             </div>
             <div>
-              <label className="label" htmlFor="ad-postal">Postal code</label>
+              <label className="label" htmlFor="ad-postal">{t('account.postal')}</label>
               <input id="ad-postal" className="field" value={newAddress.postal_code} onChange={(e) => setNewAddress({ ...newAddress, postal_code: e.target.value })} />
             </div>
             <button type="submit" className="btn-primary">
               <Plus className="h-4 w-4" aria-hidden="true" />
-              Save address
+              {t('account.saveAddress')}
             </button>
           </form>
         </div>
-        <span id="addresses-heading" className="sr-only">Saved addresses</span>
+        <span id="addresses-heading" className="sr-only">{t('account.addresses')}</span>
       </section>
 
       <section aria-labelledby="favorites-heading">
-        <SectionHeader icon={<UtensilsCrossed className="h-5 w-5" aria-hidden="true" />} title="Favourites" subtitle="Your saved dishes" />
-        <span id="favorites-heading" className="sr-only">Favourites</span>
+        <SectionHeader icon={<UtensilsCrossed className="h-5 w-5" aria-hidden="true" />} title={t('account.favorites')} subtitle={t('account.favoritesSub')} />
+        <span id="favorites-heading" className="sr-only">{t('account.favorites')}</span>
         {favoriteProducts.length === 0 ? (
-          <p className="text-sm text-ink-muted">Tap the heart on any dish to save it here.</p>
+          <p className="text-sm text-ink-muted">{t('account.favoritesEmpty')}</p>
         ) : (
           <ProductGrid products={favoriteProducts} onOpen={setOpenProduct} />
         )}

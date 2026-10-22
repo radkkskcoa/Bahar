@@ -1,12 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
+import { useI18n } from '../context/I18nContext.jsx';
 
 /**
  * Side sheet (desktop) / bottom sheet (mobile). Same accessibility contract as Modal.
  */
 export default function Drawer({ open, onClose, title, children, footer, side = 'right' }) {
   const panelRef = useRef(null);
+  const { t } = useI18n();
 
   useEffect(() => {
     if (!open) return undefined;
@@ -34,7 +36,7 @@ export default function Drawer({ open, onClose, title, children, footer, side = 
     <div className={`fixed inset-0 z-[85] flex ${side === 'right' ? 'justify-end' : 'items-end justify-center'} sm:p-0`}>
       <button
         type="button"
-        aria-label="Close panel"
+        aria-label={t('common.closePanel')}
         tabIndex={-1}
         className="absolute inset-0 cursor-default bg-black/75 animate-fade-in"
         onClick={onClose}
@@ -50,7 +52,7 @@ export default function Drawer({ open, onClose, title, children, footer, side = 
       >
         <div className="flex items-center justify-between gap-4 border-b border-line px-5 py-4">
           <h2 className="text-lg font-extrabold">{title}</h2>
-          <button type="button" className="icon-btn h-9 w-9" onClick={onClose} aria-label="Close">
+          <button type="button" className="icon-btn h-9 w-9" onClick={onClose} aria-label={t('common.close')}>
             <X className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>

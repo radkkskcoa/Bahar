@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
+import { useI18n } from '../context/I18nContext.jsx';
 
 /**
  * Accessible modal: labelled dialog, Escape to close, backdrop click, scroll lock,
@@ -8,6 +9,7 @@ import { X } from 'lucide-react';
  */
 export default function Modal({ open, onClose, title, description, children, footer, size = 'md' }) {
   const panelRef = useRef(null);
+  const { t } = useI18n();
 
   useEffect(() => {
     if (!open) return undefined;
@@ -32,7 +34,7 @@ export default function Modal({ open, onClose, title, description, children, foo
     <div className="fixed inset-0 z-[80] flex items-end justify-center sm:items-center sm:p-6">
       <button
         type="button"
-        aria-label="Close dialog"
+        aria-label={t('common.closeDialog')}
         tabIndex={-1}
         className="absolute inset-0 cursor-default bg-black/75 animate-fade-in"
         onClick={onClose}
@@ -51,7 +53,7 @@ export default function Modal({ open, onClose, title, description, children, foo
             <h2 className="text-lg font-extrabold">{title}</h2>
             {description ? <p className="mt-1 text-sm text-ink-muted">{description}</p> : null}
           </div>
-          <button type="button" className="icon-btn h-9 w-9" onClick={onClose} aria-label="Close">
+          <button type="button" className="icon-btn h-9 w-9" onClick={onClose} aria-label={t('common.close')}>
             <X className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>

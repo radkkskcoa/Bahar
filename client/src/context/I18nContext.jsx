@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import { LANGUAGES, translate } from '../lib/i18n.js';
+import { DEFAULT_LANGUAGE, LANGUAGES, translate } from '../lib/i18n.js';
 
 const I18nContext = createContext(null);
 const STORAGE_KEY = 'ch_language';
@@ -7,7 +7,7 @@ const STORAGE_KEY = 'ch_language';
 export function I18nProvider({ children }) {
   const [language, setLanguageState] = useState(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return LANGUAGES.some((l) => l.code === stored) ? stored : 'en';
+    return LANGUAGES.some((l) => l.code === stored) ? stored : DEFAULT_LANGUAGE;
   });
 
   const setLanguage = useCallback((code) => {
@@ -24,7 +24,7 @@ export function I18nProvider({ children }) {
       dir: meta.dir,
       isRtl: meta.dir === 'rtl',
       locale: meta.locale,
-      t: (key) => translate(language, key),
+      t: (key, params) => translate(language, key, params),
     };
   }, [language, setLanguage]);
 

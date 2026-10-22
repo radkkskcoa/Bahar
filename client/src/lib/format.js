@@ -28,18 +28,27 @@ export function formatDate(iso, locale = 'en-US', withTime = true) {
   }
 }
 
-/** Steps shown in the order tracker. Pickup swaps the courier step for a counter handover. */
-export function orderSteps(fulfillment = 'delivery') {
+/**
+ * Steps shown in the order tracker. Pickup swaps the courier step for a counter handover.
+ * Pass the `t` helper to get translated labels; without it the keys come back untranslated,
+ * which is all `statusIndex` needs.
+ */
+export function orderSteps(fulfillment = 'delivery', t = (key) => key) {
   const steps = [
-    { key: 'confirmed', label: 'Confirmed', icon: 'check', hint: 'We received your order' },
-    { key: 'preparing', label: 'Preparing', icon: 'chef', hint: 'Our chefs are cooking' },
+    { key: 'confirmed', label: t('step.confirmed'), icon: 'check', hint: t('step.hint.confirmed') },
+    { key: 'preparing', label: t('step.preparing'), icon: 'chef', hint: t('step.hint.preparing') },
   ];
   if (fulfillment === 'pickup') {
-    steps.push({ key: 'ready', label: 'Ready', icon: 'bag', hint: 'Waiting at the counter' });
+    steps.push({ key: 'ready', label: t('step.ready'), icon: 'bag', hint: t('step.hint.ready') });
   } else {
-    steps.push({ key: 'on_the_way', label: 'On the way', icon: 'scooter', hint: 'Rider is heading to you' });
+    steps.push({ key: 'on_the_way', label: t('step.on_the_way'), icon: 'scooter', hint: t('step.hint.on_the_way') });
   }
-  steps.push({ key: 'delivered', label: fulfillment === 'pickup' ? 'Collected' : 'Delivered', icon: 'home', hint: 'Enjoy your food' });
+  steps.push({
+    key: 'delivered',
+    label: fulfillment === 'pickup' ? t('step.collected') : t('step.delivered'),
+    icon: 'home',
+    hint: t('step.hint.delivered'),
+  });
   return steps;
 }
 
@@ -53,14 +62,15 @@ export function statusIndex(status, fulfillment = 'delivery') {
   return 0;
 }
 
-export function etaLabel(minutes, locale = 'en-US') {
-  if (!Array.isArray(minutes) || minutes.length === 0) return '18–22 min';
-  const [min, max] = minutes.length > 1 ? minutes : [minutes[0], minutes[0]];
+export function etaLabel(minutes, locale = 'en-US', t) {
+  const range = Array.isArray(minutes) && minutes.length > 0 ? minutes : [18, 22];
+  const [min, max] = range.length > 1 ? range : [range[0], range[0]];
+  const unit = t ? t('common.minutesShort') : 'min';
   try {
     const fmt = new Intl.NumberFormat(locale);
-    return `${fmt.format(min)}–${fmt.format(max)} min`;
+    return `${fmt.format(min)}–${fmt.format(max)} ${unit}`;
   } catch {
-    return `${min}–${max} min`;
+    return `${min}–${max} ${unit}`;
   }
 }
 

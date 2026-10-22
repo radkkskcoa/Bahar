@@ -1,9 +1,12 @@
 import { CategoryIcon } from './CategoryIcon.jsx';
+import { useI18n } from '../context/I18nContext.jsx';
 
 /** Horizontally scrollable category tiles — data-driven, keyboard reachable. */
 export default function CategoryScroller({ categories, activeSlug, onSelect }) {
+  const { t } = useI18n();
+
   return (
-    <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0" role="tablist" aria-label="Food categories">
+    <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0" role="tablist" aria-label={t('home.categories')}>
       <button
         type="button"
         role="tab"
@@ -15,7 +18,7 @@ export default function CategoryScroller({ categories, activeSlug, onSelect }) {
         <span className={`grid h-10 w-10 place-items-center rounded-xl ${!activeSlug ? 'bg-white/15' : 'bg-base text-lime'}`}>
           <CategoryIcon name="salad" />
         </span>
-        All
+        {t('categories.all')}
       </button>
 
       {categories.map((category) => {

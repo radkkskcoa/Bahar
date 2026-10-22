@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import SearchBar from '../components/SearchBar.jsx';
-import SearchFiltersPanel, { DEFAULT_FILTERS, SORT_OPTIONS } from '../components/SearchFiltersPanel.jsx';
+import SearchFiltersPanel, { DEFAULT_FILTERS, sortOptions } from '../components/SearchFiltersPanel.jsx';
 import CategoryScroller from '../components/CategoryScroller.jsx';
 import ProductGrid from '../components/ProductGrid.jsx';
 import ProductDetailsModal from '../components/ProductDetailsModal.jsx';
@@ -93,9 +93,9 @@ export default function MenuPage() {
   return (
     <div className="container-page space-y-6 py-6">
       <header className="space-y-2">
-        <h1 className="text-3xl font-extrabold sm:text-4xl">Full menu</h1>
+        <h1 className="text-3xl font-extrabold sm:text-4xl">{t('menu.title')}</h1>
         <p className="text-sm text-ink-muted">
-          {menuProducts.length} dishes · {categories.length} categories
+          {t('menu.counts', { dishes: menuProducts.length, categories: categories.length })}
         </p>
       </header>
 
@@ -114,7 +114,9 @@ export default function MenuPage() {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-ink-muted" aria-live="polite">
-          {status === 'loading' ? <Loader2 className="inline h-4 w-4 animate-spin" aria-hidden="true" /> : `${results.length} results`}
+          {status === 'loading'
+            ? <Loader2 className="inline h-4 w-4 animate-spin" aria-hidden="true" />
+            : t('menu.results', { count: results.length })}
         </p>
         <label className="flex items-center gap-2 text-xs text-ink-muted">
           {t('search.sort')}
@@ -123,7 +125,7 @@ export default function MenuPage() {
             value={filters.sort}
             onChange={(event) => setFilters({ ...filters, sort: event.target.value })}
           >
-            {SORT_OPTIONS.map((option) => (
+            {sortOptions(t).map((option) => (
               <option key={option.value} value={option.value}>{option.label}</option>
             ))}
           </select>
@@ -137,7 +139,7 @@ export default function MenuPage() {
           products={results}
           onOpen={setOpenProduct}
           emptyTitle={t('search.empty')}
-          emptyBody="Try another search term, or clear the filters to see the whole menu."
+          emptyBody={t('menu.emptyBody')}
         />
       )}
 

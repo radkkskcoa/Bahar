@@ -8,20 +8,21 @@ import { useI18n } from '../context/I18nContext.jsx';
 
 export default function NotificationPanel({ open, onClose }) {
   const { notifications, unreadCount, markNotificationsRead, user } = useAuth();
-  const { locale } = useI18n();
+  const { t, locale } = useI18n();
 
   useEffect(() => {
     if (open && unreadCount > 0) markNotificationsRead();
   }, [open, unreadCount, markNotificationsRead]);
 
   return (
-    <Drawer open={open} onClose={onClose} title="Notifications" side="right">
+    <Drawer open={open} onClose={onClose} title={t('nav.notifications')} side="right">
       {!user ? (
         <p className="text-sm text-ink-soft">
-          <Link to="/account?mode=signin" className="text-brand" onClick={onClose}>Sign in</Link> to get order updates and reward news.
+          <Link to="/account?mode=signin" className="text-brand" onClick={onClose}>{t('notifications.signInLead')}</Link>{' '}
+          {t('notifications.signInRest')}
         </p>
       ) : notifications.length === 0 ? (
-        <p className="text-sm text-ink-muted">Nothing yet — order updates will show up here.</p>
+        <p className="text-sm text-ink-muted">{t('notifications.empty')}</p>
       ) : (
         <ul className="space-y-3">
           {notifications.map((notification) => (
@@ -39,7 +40,7 @@ export default function NotificationPanel({ open, onClose }) {
                 <span className="text-[11px] text-ink-muted">{formatDate(notification.created_at, locale)}</span>
                 {notification.href ? (
                   <Link to={notification.href} className="text-xs font-semibold text-brand" onClick={onClose}>
-                    View
+                    {t('notifications.view')}
                   </Link>
                 ) : null}
               </div>

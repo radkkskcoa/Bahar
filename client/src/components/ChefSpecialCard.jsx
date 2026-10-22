@@ -3,11 +3,13 @@ import ProductImage from './ProductImage.jsx';
 import { Badge } from './ui.jsx';
 import { useCart } from '../context/CartContext.jsx';
 import { useMoney } from '../lib/money.js';
+import { useI18n } from '../context/I18nContext.jsx';
 
 /** Editorial "Chef Specials" card. */
 export default function ChefSpecialCard({ product, onOpen }) {
   const { add, openDrawer } = useCart();
   const money = useMoney();
+  const { t } = useI18n();
   const needsChoices = product.option_groups?.some((group) => group.required) ?? false;
 
   return (
@@ -16,9 +18,9 @@ export default function ChefSpecialCard({ product, onOpen }) {
       <div className="absolute inset-x-0 top-0 flex justify-between p-4">
         <Badge tone="lime">
           <PenLine className="h-3 w-3" aria-hidden="true" />
-          {product.badge ?? "Chef's special"}
+          {product.badge ?? t('product.chefSpecial')}
         </Badge>
-        <Badge tone="muted">Limited</Badge>
+        <Badge tone="muted">{t('product.limited')}</Badge>
       </div>
 
       <div className="space-y-3 p-5">
@@ -26,7 +28,7 @@ export default function ChefSpecialCard({ product, onOpen }) {
         <p className="text-sm text-ink-muted">{product.description}</p>
         <p className="inline-flex items-center gap-2 text-xs text-ink-muted">
           <Heart className="h-3.5 w-3.5 text-brand" aria-hidden="true" />
-          Made with love by our chefs
+          {t('product.madeWithLove')}
         </p>
         <div className="flex items-center justify-between gap-3 pt-1">
           <span className="text-2xl font-extrabold text-brand">{money(product.price_cents)}</span>
@@ -40,7 +42,7 @@ export default function ChefSpecialCard({ product, onOpen }) {
             }}
           >
             <Plus className="h-4 w-4" aria-hidden="true" />
-            Add
+            {t('common.add')}
           </button>
         </div>
       </div>

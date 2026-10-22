@@ -76,5 +76,11 @@ checkout → tracking, and the admin dashboard) are the current verification pat
   the preview needs a full reload afterwards.
 - Product photography is served from remote Unsplash URLs (verified reachable). Any URL
   can be swapped from the dashboard (`Products` or `Business settings → hero image`).
-- Persian (`fa`) switches the document to RTL and uses Vazirmatn. UI chrome is
-  translated; catalog content is whatever the business typed into the database.
+- Language: UI strings live in `client/src/lib/locales/en.js` and `fa.js` (same key
+  set, `{placeholder}` interpolation via `t('key', { … })`). **Persian is the default**
+  (`DEFAULT_LANGUAGE` in `client/src/lib/i18n.js`); the toggle sits in the desktop header
+  and in the mobile nav drawer. Switching to `fa` sets RTL on `<html>` and uses
+  Vazirmatn. Catalog content (product names, descriptions), business settings copy
+  (hero headline, contact details) and API messages are data, not chrome — they stay in
+  whatever language the business typed into the dashboard. The admin dashboard
+  (`/admin`) is still English-only.

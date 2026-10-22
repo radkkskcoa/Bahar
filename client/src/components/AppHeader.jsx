@@ -18,12 +18,12 @@ export default function AppHeader() {
   const { count, openDrawer } = useCart();
   const { brand } = useCatalog();
   const { destination } = useDestination();
-  const { t, language, setLanguage } = useI18n();
+  const { t, language, setLanguage, languages } = useI18n();
   const [navOpen, setNavOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [locationOpen, setLocationOpen] = useState(false);
 
-  const destinationLabel = destination.label || 'Home';
+  const destinationLabel = destination.label || t('location.labelPlaceholder');
 
   return (
     <>
@@ -33,18 +33,18 @@ export default function AppHeader() {
             type="button"
             className="icon-btn lg:hidden"
             onClick={() => setNavOpen(true)}
-            aria-label="Open navigation menu"
+            aria-label={t('common.openNav')}
           >
             <Menu className="h-5 w-5" aria-hidden="true" />
           </button>
 
-          <Link to="/" className="flex items-center gap-2" aria-label={`${brand.name} home`}>
+          <Link to="/" className="flex items-center gap-2" aria-label={t('common.brandHome', { brand: brand.name })}>
             <span className="grid h-10 w-10 place-items-center rounded-2xl bg-brand text-white">
               <ChefHat className="h-5 w-5" aria-hidden="true" />
             </span>
             <span className="hidden flex-col leading-none sm:flex">
               <span className="text-base font-extrabold">{brand.name}</span>
-              <span className="text-[10px] uppercase tracking-widest text-lime">chicken &amp; more</span>
+              <span className="text-[10px] uppercase tracking-widest text-lime">{t('header.tagline')}</span>
             </span>
           </Link>
 
@@ -52,7 +52,7 @@ export default function AppHeader() {
             type="button"
             onClick={() => setLocationOpen(true)}
             className="ms-1 flex min-h-[40px] items-center gap-1.5 rounded-full border border-line bg-elevate px-3 text-xs font-semibold text-ink-soft transition hover:border-brand/60 hover:text-white"
-            aria-label={`${t('nav.deliverTo')} ${destinationLabel} — change address`}
+            aria-label={`${t('nav.deliverTo')} ${destinationLabel} — ${t('location.changeAria')}`}
           >
             <MapPin className="h-3.5 w-3.5 text-brand" aria-hidden="true" />
             <span className="max-w-[110px] truncate">
@@ -60,7 +60,7 @@ export default function AppHeader() {
             </span>
           </button>
 
-          <nav className="ms-6 hidden items-center gap-1 lg:flex" aria-label="Main">
+          <nav className="ms-6 hidden items-center gap-1 lg:flex" aria-label={t('common.mainNav')}>
             {NAV_LINKS.map((link) => (
               <NavLink
                 key={link.to}
@@ -77,19 +77,19 @@ export default function AppHeader() {
           </nav>
 
           <div className="ms-auto flex items-center gap-2">
-            <div className="hidden items-center gap-1 rounded-full border border-line bg-elevate p-1 sm:flex" role="group" aria-label="Language">
+            <div className="hidden items-center gap-1 rounded-full border border-line bg-elevate p-1 sm:flex" role="group" aria-label={t('nav.language')}>
               <Globe className="ms-1.5 h-3.5 w-3.5 text-ink-muted" aria-hidden="true" />
-              {['en', 'fa'].map((code) => (
+              {languages.map((entry) => (
                 <button
-                  key={code}
+                  key={entry.code}
                   type="button"
-                  onClick={() => setLanguage(code)}
-                  aria-pressed={language === code}
+                  onClick={() => setLanguage(entry.code)}
+                  aria-pressed={language === entry.code}
                   className={`rounded-full px-2.5 py-1 text-[11px] font-bold uppercase transition ${
-                    language === code ? 'bg-brand text-white' : 'text-ink-muted hover:text-white'
+                    language === entry.code ? 'bg-brand text-white' : 'text-ink-muted hover:text-white'
                   }`}
                 >
-                  {code}
+                  {entry.code}
                 </button>
               ))}
             </div>
@@ -98,7 +98,7 @@ export default function AppHeader() {
               type="button"
               className="icon-btn"
               onClick={() => setNotificationsOpen(true)}
-              aria-label={`${t('nav.notifications')}${unreadCount ? `, ${unreadCount} unread` : ''}`}
+              aria-label={`${t('nav.notifications')}${unreadCount ? t('message.unread', { count: unreadCount }) : ''}`}
             >
               <Bell className="h-4 w-4" aria-hidden="true" />
               {unreadCount > 0 ? (
@@ -112,7 +112,7 @@ export default function AppHeader() {
               type="button"
               className="icon-btn"
               onClick={openDrawer}
-              aria-label={`${t('nav.cart')}${count ? `, ${count} items` : ''}`}
+              aria-label={`${t('nav.cart')}${count ? t('message.items', { count }) : ''}`}
             >
               <ShoppingBag className="h-4 w-4" aria-hidden="true" />
               {count > 0 ? (
@@ -131,7 +131,7 @@ export default function AppHeader() {
                   {user ? (
                     <>
                       <p className="px-3 py-2 text-xs text-ink-muted">
-                        Signed in as <span className="font-semibold text-ink">{user.name}</span>
+                        {t('header.signedInAs')} <span className="font-semibold text-ink">{user.name}</span>
                       </p>
                       <Link to="/account" className="block rounded-xl px-3 py-2 text-sm font-semibold hover:bg-elevate">
                         {t('nav.account')}

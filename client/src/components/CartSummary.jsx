@@ -57,14 +57,14 @@ export default function CartSummary({ onCheckout, showCheckout = true, disabled 
 
       {totals && !totals.minimum_ok ? (
         <p className="rounded-xl border border-warn/40 bg-warn/10 px-3 py-2 text-xs text-warn" role="alert">
-          Minimum order for delivery is {money(totals.minimum_order_cents)}. Add a little more to check out.
+          {t('cart.minimum', { amount: money(totals.minimum_order_cents) })}
         </p>
       ) : null}
 
       {remainingForFreeDelivery > 0 ? (
         <p className="flex items-center gap-1.5 text-xs text-ink-muted">
           <Truck className="h-3.5 w-3.5 text-lime" aria-hidden="true" />
-          Add {money(remainingForFreeDelivery)} for free delivery
+          {t('cart.freeDeliveryHint', { amount: money(remainingForFreeDelivery) })}
         </p>
       ) : null}
 
@@ -82,7 +82,7 @@ export default function CartSummary({ onCheckout, showCheckout = true, disabled 
         <div className="flex justify-between">
           <dt className="text-ink-muted">{t('cart.delivery')}</dt>
           <dd className="font-semibold">
-            {fulfillment === 'pickup' ? 'Pickup' : totals?.delivery_fee_cents ? money(totals.delivery_fee_cents) : t('cart.free')}
+            {fulfillment === 'pickup' ? t('cart.pickup') : totals?.delivery_fee_cents ? money(totals.delivery_fee_cents) : t('cart.free')}
           </dd>
         </div>
         <div className="flex justify-between">

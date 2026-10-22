@@ -17,7 +17,7 @@ export default function OrderTrackingPage() {
   const { user, ready } = useAuth();
   const { delivery } = useCatalog();
   const money = useMoney();
-  const { locale } = useI18n();
+  const { t, locale } = useI18n();
   const navigate = useNavigate();
 
   const [order, setOrder] = useState(null);
@@ -53,22 +53,21 @@ export default function OrderTrackingPage() {
   const submitLookup = (event) => {
     event.preventDefault();
     if (!proof.number.trim()) {
-      setError('Enter your order number to continue.');
+      setError(t('track.enterNumber'));
       setStatus('error');
       return;
     }
     navigate(`/track/${proof.number.trim().toUpperCase()}${proof.phone ? `?phone=${encodeURIComponent(proof.phone)}` : ''}`);
   };
 
+  // The API asks for the order's phone number (or a session) before it shows an order.
   const needsProof = status === 'error' && /phone number|Sign in/i.test(error ?? '');
 
   return (
     <div className="container-page py-6">
       <header className="mb-6 space-y-2">
-        <h1 className="text-3xl font-extrabold sm:text-4xl">Track your order</h1>
-        <p className="text-sm text-ink-muted">
-          Status updates come straight from our kitchen and delivery team. Time windows are estimates.
-        </p>
+        <h1 className="text-3xl font-extrabold sm:text-4xl">{t('track.title')}</h1>
+        <p className="text-sm text-ink-muted">{t('track.subtitle')}</p>
       </header>
 
       {!orderNumber ? (
@@ -76,10 +75,10 @@ export default function OrderTrackingPage() {
           <form className="card space-y-4 p-6" onSubmit={submitLookup}>
             <h2 className="flex items-center gap-2 text-lg font-bold">
               <PackageSearch className="h-4 w-4 text-brand" aria-hidden="true" />
-              Find an order
+              {t('track.find')}
             </h2>
             <div>
-              <label className="label" htmlFor="track-number">Order number</label>
+              <label className="label" htmlFor="track-number">{t('track.orderNumber')}</label>
               <input
                 id="track-number"
                 className="field uppercase"
@@ -90,7 +89,7 @@ export default function OrderTrackingPage() {
               />
             </div>
             <div>
-              <label className="label" htmlFor="track-phone">Phone number used for the order</label>
+              <label className="label" htmlFor="track-phone">{t('track.phone')}</label>
               <input
                 id="track-phone"
                 className="field"
@@ -99,31 +98,35 @@ export default function OrderTrackingPage() {
                 placeholder="+1 555 0100 241"
               />
             </div>
-            <button type="submit" className="btn-primary w-full">Find my order</button>
+            <button type="submit" className="btn-primary w-full">{t('track.findCta')}</button>
             {!user ? (
               <p className="text-xs text-ink-muted">
-                Signed in? <Link to="/account?mode=signin" className="text-brand">Sign in</Link> and your orders appear automatically.
+                {t('track.signedInHint')}{' '}
+                <Link to="/account?mode=signin" className="text-brand">{t('nav.signIn')}</Link>{' '}
+                {t('track.signedInHint2')}
               </p>
             ) : null}
           </form>
 
           <section className="card p-6">
-            <h2 className="mb-4 text-lg font-bold">Your recent orders</h2>
+            <h2 className="mb-4 text-lg font-bold">{t('track.recent')}</h2>
             {!user ? (
-              <p className="text-sm text-ink-muted">Sign in to see your order history here.</p>
+              <p className="text-sm text-ink-muted">{t('track.signInHistory')}</p>
             ) : myOrders.length === 0 ? (
-              <p className="text-sm text-ink-muted">No orders yet — your first one will show up here.</p>
+              <p className="text-sm text-ink-muted">{t('track.noOrders')}</p>
             ) : (
               <ul className="divide-y divide-line">
                 {myOrders.map((entry) => (
                   <li key={entry.id} className="flex items-center justify-between gap-3 py-3">
                     <div>
                       <p className="text-sm font-bold">{entry.order_number}</p>
-                      <p className="text-xs text-ink-muted">{formatDate(entry.created_at, locale)} · {money(entry.total_cents)}</p>
+                      <p className="text-xs text-ink-muted">
+                        {t('track.recentForUser', { date: formatDate(entry.created_at, locale), total: money(entry.total_cents) })}
+                      </p>
                     </div>
                     <div className="flex items-center gap-3">
                       <StatusPill status={entry.status} />
-                      <Link to={`/track/${entry.order_number}`} className="link-more">Open</Link>
+                      <Link to={`/track/${entry.order_number}`} className="link-more">{t('track.open')}</Link>
                     </div>
                   </li>
                 ))}
@@ -138,10 +141,10 @@ export default function OrderTrackingPage() {
         </div>
       ) : needsProof ? (
         <form className="card mx-auto max-w-lg space-y-4 p-6" onSubmit={submitLookup}>
-          <h2 className="text-lg font-bold">Confirm this order</h2>
-          <p className="text-sm text-ink-muted">{error}</p>
+          <h2 className="text-lg font-bold">{t('track.confirm')}</h2>
+          <p className="text-sm text-ink-muted">{t('track.needSignIn')}</p>
           <div>
-            <label className="label" htmlFor="proof-phone">Phone number used for the order</label>
+            <label className="label" htmlFor="proof-phone">{t('track.phone')}</label>
             <input
               id="proof-phone"
               className="field"
@@ -150,7 +153,7 @@ export default function OrderTrackingPage() {
               required
             />
           </div>
-          <button type="submit" className="btn-primary w-full">Show order status</button>
+          <button type="submit" className="btn-primary w-full">{t('track.showStatus')}</button>
         </form>
       ) : status === 'error' ? (
         <div className="space-y-4">
@@ -158,7 +161,7 @@ export default function OrderTrackingPage() {
           <p className="text-center">
             <button type="button" className="btn-ghost" onClick={() => lookup(orderNumber, params.get('phone') ?? undefined)}>
               <RefreshCw className="h-4 w-4" aria-hidden="true" />
-              Try again
+              {t('common.retry')}
             </button>
           </p>
         </div>
@@ -167,9 +170,9 @@ export default function OrderTrackingPage() {
           <section className="card space-y-6 p-6">
             <header className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-xs uppercase tracking-wide text-ink-muted">Order</p>
+                <p className="text-xs uppercase tracking-wide text-ink-muted">{t('track.orderLabel')}</p>
                 <h2 className="text-2xl font-extrabold">{order.order_number}</h2>
-                <p className="text-xs text-ink-muted">Placed {formatDate(order.created_at, locale)}</p>
+                <p className="text-xs text-ink-muted">{t('track.placed', { date: formatDate(order.created_at, locale) })}</p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <StatusPill status={order.status} />
@@ -179,14 +182,15 @@ export default function OrderTrackingPage() {
 
             {order.status === 'cancelled' ? (
               <p className="rounded-xl border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger" role="alert">
-                This order was cancelled. Contact support if you need help with a refund.
+                {t('track.cancelled')}
               </p>
             ) : (
               <>
                 <OrderProgress status={order.status} fulfillment={order.fulfillment} order={order} />
                 <p className="rounded-xl border border-line bg-elevate px-4 py-3 text-xs text-ink-muted">
-                  Estimated {order.fulfillment === 'pickup' ? 'pickup' : 'arrival'}:{' '}
-                  <span className="font-semibold text-ink">{etaLabel(delivery.eta_minutes, locale)}</span> (estimate)
+                  {order.fulfillment === 'pickup'
+                    ? t('track.etaPickup', { eta: etaLabel(delivery.eta_minutes, locale, t) })
+                    : t('track.etaDelivery', { eta: etaLabel(delivery.eta_minutes, locale, t) })}
                 </p>
               </>
             )}
@@ -194,17 +198,17 @@ export default function OrderTrackingPage() {
             <div className="flex flex-wrap gap-3">
               <button type="button" className="btn-ghost" onClick={() => lookup(order.order_number, params.get('phone') ?? undefined)}>
                 <RefreshCw className="h-4 w-4" aria-hidden="true" />
-                Refresh status
+                {t('track.refresh')}
               </button>
               <Link to="/support" className="btn-ghost">
                 <Headset className="h-4 w-4" aria-hidden="true" />
-                Contact support
+                {t('track.contactSupport')}
               </Link>
             </div>
           </section>
 
           <aside className="card space-y-4 p-6">
-            <h2 className="text-lg font-bold">Order details</h2>
+            <h2 className="text-lg font-bold">{t('track.details')}</h2>
             <ul className="space-y-3">
               {order.items.map((item) => (
                 <li key={item.id} className="flex items-start justify-between gap-3 text-sm">
@@ -219,30 +223,30 @@ export default function OrderTrackingPage() {
               ))}
             </ul>
             <dl className="space-y-2 border-t border-line pt-4 text-sm">
-              <div className="flex justify-between"><dt className="text-ink-muted">Subtotal</dt><dd>{money(order.subtotal_cents)}</dd></div>
+              <div className="flex justify-between"><dt className="text-ink-muted">{t('cart.subtotal')}</dt><dd>{money(order.subtotal_cents)}</dd></div>
               {order.discount_cents ? (
-                <div className="flex justify-between text-success"><dt>Discount {order.coupon_code ? `(${order.coupon_code})` : ''}</dt><dd>−{money(order.discount_cents)}</dd></div>
+                <div className="flex justify-between text-success"><dt>{t('cart.discount')} {order.coupon_code ? `(${order.coupon_code})` : ''}</dt><dd>−{money(order.discount_cents)}</dd></div>
               ) : null}
-              <div className="flex justify-between"><dt className="text-ink-muted">Delivery</dt><dd>{order.delivery_fee_cents ? money(order.delivery_fee_cents) : 'Free'}</dd></div>
-              <div className="flex justify-between"><dt className="text-ink-muted">Tax</dt><dd>{money(order.tax_cents)}</dd></div>
-              <div className="flex justify-between border-t border-line pt-2 text-base font-extrabold"><dt>Total</dt><dd className="text-brand">{money(order.total_cents)}</dd></div>
+              <div className="flex justify-between"><dt className="text-ink-muted">{t('cart.delivery')}</dt><dd>{order.delivery_fee_cents ? money(order.delivery_fee_cents) : t('cart.free')}</dd></div>
+              <div className="flex justify-between"><dt className="text-ink-muted">{t('cart.tax')}</dt><dd>{money(order.tax_cents)}</dd></div>
+              <div className="flex justify-between border-t border-line pt-2 text-base font-extrabold"><dt>{t('cart.total')}</dt><dd className="text-brand">{money(order.total_cents)}</dd></div>
             </dl>
             <div className="space-y-1 text-xs text-ink-muted">
-              <p className="font-semibold text-ink-soft">{order.fulfillment === 'pickup' ? 'Pickup order' : 'Delivering to'}</p>
+              <p className="font-semibold text-ink-soft">{order.fulfillment === 'pickup' ? t('track.pickupOrder') : t('track.deliveringTo')}</p>
               {order.address_line1 ? <p>{order.address_line1}{order.address_line2 ? `, ${order.address_line2}` : ''}</p> : null}
               {order.city ? <p>{order.city} {order.postal_code}</p> : null}
               {order.instructions ? <p className="italic">“{order.instructions}”</p> : null}
             </div>
             {order.notes ? (
               <p className="rounded-xl border border-line bg-elevate px-3 py-2 text-xs text-ink-muted">
-                Kitchen note: {order.notes}
+                {t('track.kitchenNote', { note: order.notes })}
               </p>
             ) : null}
           </aside>
         </div>
       ) : (
         <p className="flex items-center gap-2 text-sm text-ink-muted">
-          <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Loading your order…
+          <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> {t('track.loading')}
         </p>
       )}
     </div>

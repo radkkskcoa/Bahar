@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom';
 import { ChefHat, Clock, Leaf, ShieldCheck, Sparkles } from 'lucide-react';
 import { useCatalog } from '../context/CatalogContext.jsx';
+import { useI18n } from '../context/I18nContext.jsx';
+import { etaLabel } from '../lib/format.js';
 
 const DEFAULT_HERO = 'https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?auto=format&fit=crop&w=1600&q=75';
 
 /** Cinematic hero: dark scrim keeps the headline readable over the photo. */
 export default function HeroSection() {
   const { brand, settings, delivery } = useCatalog();
+  const { t, locale } = useI18n();
   const heroImage = settings.brand?.hero_image || DEFAULT_HERO;
   const headline = settings.brand?.hero_headline || 'Crispy Flavor,';
   const headlineAccent = settings.brand?.hero_headline_accent || 'Delivered Fast';
@@ -39,23 +42,23 @@ export default function HeroSection() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <Link to="/menu" className="btn-primary px-6">Order Now</Link>
-          <Link to="/menu?focus=all" className="btn-ghost px-6">Explore Menu</Link>
+          <Link to="/menu" className="btn-primary px-6">{t('hero.orderNow')}</Link>
+          <Link to="/menu?focus=all" className="btn-ghost px-6">{t('hero.exploreMenu')}</Link>
         </div>
 
         <ul className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-ink-soft">
           <li className="inline-flex items-center gap-2">
-            <Sparkles className="h-3.5 w-3.5 text-lime" aria-hidden="true" /> Freshly prepared
+            <Sparkles className="h-3.5 w-3.5 text-lime" aria-hidden="true" /> {t('hero.fresh')}
           </li>
           <li className="inline-flex items-center gap-2">
             <Clock className="h-3.5 w-3.5 text-lime" aria-hidden="true" />
-            Delivery in {delivery.eta_minutes?.[0] ?? 18}–{delivery.eta_minutes?.[1] ?? 22} min
+            {t('hero.deliveryIn', { eta: etaLabel(delivery.eta_minutes, locale, t) })}
           </li>
           <li className="inline-flex items-center gap-2">
-            <Leaf className="h-3.5 w-3.5 text-lime" aria-hidden="true" /> Quality ingredients
+            <Leaf className="h-3.5 w-3.5 text-lime" aria-hidden="true" /> {t('hero.quality')}
           </li>
           <li className="inline-flex items-center gap-2">
-            <ShieldCheck className="h-3.5 w-3.5 text-lime" aria-hidden="true" /> Secure checkout
+            <ShieldCheck className="h-3.5 w-3.5 text-lime" aria-hidden="true" /> {t('hero.secure')}
           </li>
         </ul>
       </div>

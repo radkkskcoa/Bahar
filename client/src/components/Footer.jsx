@@ -26,8 +26,8 @@ export default function Footer() {
           ) : null}
         </div>
 
-        <nav className="space-y-2" aria-label="Menu links">
-          <h3 className="text-sm font-bold uppercase tracking-wide text-lime">Menu</h3>
+        <nav className="space-y-2" aria-label={t('footer.menu')}>
+          <h3 className="text-sm font-bold uppercase tracking-wide text-lime">{t('footer.menu')}</h3>
           {NAV_LINKS.map((link) => (
             <Link key={link.to} to={link.to} className="block text-sm text-ink-soft hover:text-white">
               {t(link.key)}
@@ -35,17 +35,17 @@ export default function Footer() {
           ))}
         </nav>
 
-        <nav className="space-y-2" aria-label="Support links">
-          <h3 className="text-sm font-bold uppercase tracking-wide text-lime">Support</h3>
+        <nav className="space-y-2" aria-label={t('footer.support')}>
+          <h3 className="text-sm font-bold uppercase tracking-wide text-lime">{t('footer.support')}</h3>
           {FOOTER_LINKS.map((link) => (
             <Link key={link.to} to={link.to} className="block text-sm text-ink-soft hover:text-white">
-              {link.label}
+              {t(link.key)}
             </Link>
           ))}
         </nav>
 
         <div className="space-y-3">
-          <h3 className="text-sm font-bold uppercase tracking-wide text-lime">Visit &amp; contact</h3>
+          <h3 className="text-sm font-bold uppercase tracking-wide text-lime">{t('footer.visit')}</h3>
           <p className="flex items-start gap-2 text-sm text-ink-soft">
             <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
             {contact.address}
@@ -61,7 +61,7 @@ export default function Footer() {
           <div className="space-y-1 text-xs text-ink-muted">
             <p className="flex items-center gap-2 font-semibold text-ink-soft">
               <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-              Opening hours
+              {t('footer.openingHours')}
             </p>
             {(contact.hours ?? []).map((line) => (
               <p key={line}>{line}</p>
@@ -72,8 +72,8 @@ export default function Footer() {
 
       <div className="border-t border-line py-4">
         <div className="container-page flex flex-col items-center justify-between gap-2 text-xs text-ink-muted sm:flex-row">
-          <p>© {new Date().getFullYear()} {brand.name}. Demonstration project.</p>
-          <p>{settings.languages?.length ? `Available in ${settings.languages.join(' · ').toUpperCase()}` : null}</p>
+          <p>{t('footer.copyright', { year: new Date().getFullYear(), brand: brand.name })}</p>
+          <p>{settings.languages?.length ? t('footer.languages', { languages: settings.languages.join(' · ').toUpperCase() }) : null}</p>
         </div>
       </div>
     </footer>

@@ -6,12 +6,14 @@ import { Badge, QtyStepper, RatingStars } from './ui.jsx';
 import { useCart } from '../context/CartContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { useMoney } from '../lib/money.js';
+import { useI18n } from '../context/I18nContext.jsx';
 
 /** Product detail + customization. Totals recalculate on every option change. */
 export default function ProductDetailsModal({ product, open, onClose }) {
   const { add, openDrawer } = useCart();
   const { toast } = useToast();
   const money = useMoney();
+  const { t } = useI18n();
 
   const [selection, setSelection] = useState({});
   const [quantity, setQuantity] = useState(1);
@@ -61,7 +63,7 @@ export default function ProductDetailsModal({ product, open, onClose }) {
         return { ...current, [group.id]: selected.filter((id) => id !== item.id) };
       }
       if (selected.length >= group.max_select) {
-        setError(`${group.name}: choose up to ${group.max_select}`);
+        setError(t('product.maxSelect', { group: group.name, max: group.max_select }));
         return current;
       }
       return { ...current, [group.id]: [...selected, item.id] };
@@ -73,12 +75,12 @@ export default function ProductDetailsModal({ product, open, onClose }) {
       const count = (selection[group.id] ?? []).length;
       const min = group.required ? Math.max(group.min_select, 1) : group.min_select;
       if (count < min) {
-        setError(`Please choose ${min > 1 ? `at least ${min} options for` : ''} ${group.name}.`);
+        setError(t('product.chooseOptions', { count: min, group: group.name }));
         return;
       }
     }
     add(product, { quantity, options: chosen, notes: notes.trim() || null });
-    toast({ title: `${product.name} added`, body: `${quantity} × ${money(unitPrice)}`, tone: 'success' });
+    toast({ title: t('product.added', { name: product.name }), body: `${quantity} × ${money(unitPrice)}`, tone: 'success' });
     onClose();
     openDrawer();
   };
@@ -94,13 +96,13 @@ export default function ProductDetailsModal({ product, open, onClose }) {
           <div className="flex items-center gap-4">
             <QtyStepper value={quantity} onChange={(next) => setQuantity(Math.max(1, next))} />
             <div>
-              <p className="text-[11px] uppercase tracking-wide text-ink-muted">Item total</p>
+              <p className="text-[11px] uppercase tracking-wide text-ink-muted">{t('product.itemTotal')}</p>
               <p className="text-xl font-extrabold text-brand" aria-live="polite">{money(total)}</p>
             </div>
           </div>
           <button type="button" className="btn-primary w-full sm:w-auto" onClick={submit} disabled={!product.available}>
             <ShoppingBag className="h-4 w-4" aria-hidden="true" />
-            {product.available ? 'Add to cart' : 'Unavailable'}
+            {product.available ? t('common.addToCart') : t('product.unavailable')}
           </button>
         </div>
       }
@@ -116,25 +118,25 @@ export default function ProductDetailsModal({ product, open, onClose }) {
           <div className="flex flex-wrap items-center gap-2">
             {product.badge ? <Badge tone="brand">{product.badge}</Badge> : null}
             {product.spicy ? (
-              <Badge tone="danger"><Flame className="h-3 w-3" aria-hidden="true" /> Spicy</Badge>
+              <Badge tone="danger"><Flame className="h-3 w-3" aria-hidden="true" /> {t('product.spicy')}</Badge>
             ) : null}
-            {product.vegetarian ? <Badge tone="success">Vegetarian</Badge> : null}
+            {product.vegetarian ? <Badge tone="success">{t('product.vegetarian')}</Badge> : null}
             <RatingStars value={product.rating} count={product.review_count} />
           </div>
           <p className="text-2xl font-extrabold text-brand">{money(product.price_cents)}</p>
           <p className="text-sm text-ink-soft">{product.description}</p>
           {product.prep_minutes ? (
-            <p className="text-xs text-ink-muted">Estimated preparation: about {product.prep_minutes} minutes</p>
+            <p className="text-xs text-ink-muted">{t('product.prepTime', { minutes: product.prep_minutes })}</p>
           ) : null}
           {(product.ingredients || product.allergens) && (
             <details className="rounded-xl border border-line bg-elevate px-4 py-3 text-xs text-ink-soft">
               <summary className="flex cursor-pointer items-center gap-2 font-semibold text-ink">
                 <Info className="h-3.5 w-3.5" aria-hidden="true" />
-                Ingredients &amp; allergens
+                {t('product.ingredientsTitle')}
               </summary>
               <div className="mt-2 space-y-1">
-                {product.ingredients ? <p><span className="text-ink-muted">Ingredients:</span> {product.ingredients}</p> : null}
-                {product.allergens ? <p><span className="text-ink-muted">Allergens:</span> {product.allergens}</p> : null}
+                {product.ingredients ? <p><span className="text-ink-muted">{t('product.ingredients')}</span> {product.ingredients}</p> : null}
+                {product.allergens ? <p><span className="text-ink-muted">{t('product.allergens')}</span> {product.allergens}</p> : null}
               </div>
             </details>
           )}
@@ -150,8 +152,8 @@ export default function ProductDetailsModal({ product, open, onClose }) {
                 <legend className="px-1 text-sm font-bold">
                   {group.name}
                   <span className="ms-2 text-[11px] font-medium uppercase tracking-wide text-ink-muted">
-                    {group.required ? 'Required' : 'Optional'}
-                    {group.type === 'multi' ? ` · up to ${group.max_select}` : ''}
+                    {group.required ? t('common.required') : t('common.optional')}
+                    {group.type === 'multi' ? ` · ${t('product.upTo', { max: group.max_select })}` : ''}
                   </span>
                 </legend>
                 <div className="mt-2 flex flex-wrap gap-2">
@@ -180,14 +182,14 @@ export default function ProductDetailsModal({ product, open, onClose }) {
       ) : null}
 
       <div className="mt-5">
-        <label className="label" htmlFor="product-notes">Special instructions (optional)</label>
+        <label className="label" htmlFor="product-notes">{t('product.instructions')}</label>
         <textarea
           id="product-notes"
           rows={2}
           maxLength={280}
           value={notes}
           onChange={(event) => setNotes(event.target.value)}
-          placeholder="No pickles, extra crispy…"
+          placeholder={t('product.instructionsPlaceholder')}
           className="field resize-none"
         />
       </div>

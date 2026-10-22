@@ -30,13 +30,13 @@ export default function LoyaltyCard({ points = 0, nextReward, rewards = [], sign
           <div className="flex items-end justify-between gap-4">
             <div>
               <p className="text-3xl font-extrabold text-lime">{formatNumber(points, locale)}</p>
-              <p className="text-xs uppercase tracking-wide text-ink-muted">Points balance</p>
+              <p className="text-xs uppercase tracking-wide text-ink-muted">{t('loyalty.pointsBalance')}</p>
             </div>
             {nextReward ? (
               <div className="text-end">
                 <p className="text-sm font-semibold text-ink-soft">{nextReward.name}</p>
                 <p className="text-xs text-ink-muted">
-                  Next reward {formatNumber(nextReward.points_cost, locale)} pts
+                  {t('loyalty.nextReward', { points: formatNumber(nextReward.points_cost, locale) })}
                 </p>
               </div>
             ) : null}
@@ -49,13 +49,13 @@ export default function LoyaltyCard({ points = 0, nextReward, rewards = [], sign
               aria-valuenow={progress}
               aria-valuemin={0}
               aria-valuemax={100}
-              aria-label="Progress to next reward"
+              aria-label={t('loyalty.progressAria')}
             >
               <div className="h-full rounded-full bg-lime transition-all duration-500" style={{ width: `${progress}%` }} />
             </div>
             <p className="text-xs text-ink-muted">
-              {progress}% to your next reward
-              {nextReward ? ` · ${formatNumber(Math.max(target - points, 0), locale)} pts to go` : ''}
+              {t('loyalty.progress', { percent: formatNumber(progress, locale) })}
+              {nextReward ? ` ${t('loyalty.toGo', { points: formatNumber(Math.max(target - points, 0), locale) })}` : ''}
             </p>
           </div>
 
@@ -74,10 +74,10 @@ export default function LoyaltyCard({ points = 0, nextReward, rewards = [], sign
                       className={`btn-sm shrink-0 ${affordable ? 'btn-lime' : 'btn-ghost'}`}
                       onClick={() => onRedeem?.(reward)}
                       disabled={!affordable || redeeming}
-                      aria-label={`Redeem ${reward.name} for ${reward.points_cost} points`}
+                      aria-label={t('loyalty.redeemAria', { name: reward.name, points: formatNumber(reward.points_cost, locale) })}
                     >
                       <Gift className="h-3.5 w-3.5" aria-hidden="true" />
-                      {formatNumber(reward.points_cost, locale)} pts
+                      {t('rewards.pts', { points: formatNumber(reward.points_cost, locale) })}
                     </button>
                   </li>
                 );
@@ -85,14 +85,12 @@ export default function LoyaltyCard({ points = 0, nextReward, rewards = [], sign
             </ul>
           ) : null}
 
-          <Link to="/rewards" className="link-more mt-4 inline-block">View rewards →</Link>
+          <Link to="/rewards" className="link-more mt-4 inline-block">{t('loyalty.viewRewards')} →</Link>
         </>
       ) : (
         <div className="space-y-3">
-          <p className="text-sm text-ink-soft">
-            Earn points on every order and unlock free sides, discounts and a free bucket.
-          </p>
-          <Link to="/account?mode=signin" className="btn-lime">Sign in to start earning</Link>
+          <p className="text-sm text-ink-soft">{t('loyalty.signedOutBody')}</p>
+          <Link to="/account?mode=signin" className="btn-lime">{t('loyalty.signInCta')}</Link>
         </div>
       )}
     </section>

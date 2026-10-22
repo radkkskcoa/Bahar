@@ -52,6 +52,14 @@ overview metrics, order management with status transitions, product CRUD, campai
 coupon management, customer list and business settings (fees, minimum order, tax, hours,
 contact details, hero image).
 
+## Languages
+
+The storefront ships in **Persian (default) and English**, with the switch in the header
+(desktop) and in the menu drawer (mobile). Persian renders the whole site right-to-left in
+Vazirmatn. UI strings live in `client/src/lib/locales/`; product names, hero copy and
+contact details are business data you edit in the admin dashboard, so they appear in
+whatever language you type there. The admin dashboard itself is English-only for now.
+
 ## Configuration
 
 Business configuration lives in the `business_setting` table and is editable from the

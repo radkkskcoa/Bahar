@@ -1,5 +1,5 @@
 import { Link, NavLink } from 'react-router-dom';
-import { LayoutDashboard, LogIn, LogOut, MapPin, User } from 'lucide-react';
+import { Globe, LayoutDashboard, LogIn, LogOut, MapPin, User } from 'lucide-react';
 import Drawer from './Drawer.jsx';
 import { NAV_LINKS } from '../lib/nav.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -7,11 +7,11 @@ import { useI18n } from '../context/I18nContext.jsx';
 
 export default function NavDrawer({ open, onClose, onOpenLocation }) {
   const { user, isStaff, logout } = useAuth();
-  const { t } = useI18n();
+  const { t, language, setLanguage, languages } = useI18n();
 
   return (
     <Drawer open={open} onClose={onClose} title={t('nav.menu')} side="right">
-      <nav className="space-y-1" aria-label="Main">
+      <nav className="space-y-1" aria-label={t('common.mainNav')}>
         {NAV_LINKS.map((link) => (
           <NavLink
             key={link.to}
@@ -47,9 +47,26 @@ export default function NavDrawer({ open, onClose, onOpenLocation }) {
         <MapPin className="h-4 w-4 text-brand" aria-hidden="true" />
         <span>
           <span className="block font-semibold">{t('nav.deliverTo')}</span>
-          <span className="block text-xs text-ink-muted">Set your delivery address</span>
+          <span className="block text-xs text-ink-muted">{t('location.setAddress')}</span>
         </span>
       </button>
+
+      <div className="mt-4 flex items-center gap-1 rounded-full border border-line bg-elevate p-1" role="group" aria-label={t('nav.language')}>
+        <Globe className="ms-1.5 h-3.5 w-3.5 text-ink-muted" aria-hidden="true" />
+        {languages.map((entry) => (
+          <button
+            key={entry.code}
+            type="button"
+            onClick={() => setLanguage(entry.code)}
+            aria-pressed={language === entry.code}
+            className={`flex-1 rounded-full px-2.5 py-1.5 text-xs font-bold transition ${
+              language === entry.code ? 'bg-brand text-white' : 'text-ink-muted hover:text-white'
+            }`}
+          >
+            {entry.label}
+          </button>
+        ))}
+      </div>
 
       <div className="mt-4 space-y-2">
         {user ? (

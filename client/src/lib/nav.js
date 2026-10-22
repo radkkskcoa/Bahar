@@ -9,7 +9,7 @@ export const NAV_LINKS = [
 export const FOOTER_LINKS = [
   { to: '/support', key: 'nav.support', label: 'Support & FAQ' },
   { to: '/track', key: 'nav.track', label: 'Track order' },
-  { to: '/terms', label: 'Terms & conditions' },
-  { to: '/privacy', label: 'Privacy policy' },
-  { to: '/refunds', label: 'Refund & cancellation' },
+  { to: '/terms', key: 'footer.terms', label: 'Terms & conditions' },
+  { to: '/privacy', key: 'footer.privacy', label: 'Privacy policy' },
+  { to: '/refunds', key: 'footer.refunds', label: 'Refund & cancellation' },
 ];

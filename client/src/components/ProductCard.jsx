@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useCatalog } from '../context/CatalogContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { useMoney } from '../lib/money.js';
+import { useI18n } from '../context/I18nContext.jsx';
 
 /** Product tile used across the home page, menu and search results. */
 export default function ProductCard({ product, onOpen }) {
@@ -14,6 +15,7 @@ export default function ProductCard({ product, onOpen }) {
   const { categoryBySlug } = useCatalog();
   const { toast } = useToast();
   const money = useMoney();
+  const { t } = useI18n();
 
   const isFavorite = favorites.includes(product.id);
   const category = categoryBySlug.get(product.category_slug);
@@ -21,7 +23,7 @@ export default function ProductCard({ product, onOpen }) {
 
   const addToCart = () => {
     if (!product.available) {
-      toast({ title: `${product.name} is unavailable`, body: 'Please pick something else for now.', tone: 'error' });
+      toast({ title: t('product.unavailableTitle', { name: product.name }), body: t('product.unavailableBody'), tone: 'error' });
       return;
     }
     // Anything with required choices must be configured first.
@@ -30,7 +32,7 @@ export default function ProductCard({ product, onOpen }) {
       return;
     }
     add(product, { quantity: 1 });
-    toast({ title: `${product.name} added`, body: 'Your cart has been updated.', tone: 'success' });
+    toast({ title: t('product.added', { name: product.name }), body: t('product.addedBody'), tone: 'success' });
     openDrawer();
   };
 
@@ -41,7 +43,7 @@ export default function ProductCard({ product, onOpen }) {
           type="button"
           onClick={() => onOpen(product)}
           className="block w-full text-left"
-          aria-label={`View ${product.name}`}
+          aria-label={t('product.view', { name: product.name })}
         >
           <ProductImage
             src={product.image_url}
@@ -60,14 +62,16 @@ export default function ProductCard({ product, onOpen }) {
           onClick={() => toggleFavorite(product.id)}
           className="absolute bottom-3 end-3 grid h-9 w-9 place-items-center rounded-full border border-line bg-base/80
                      text-ink-soft backdrop-blur transition hover:text-brand"
-          aria-label={isFavorite ? `Remove ${product.name} from favourites` : `Save ${product.name} to favourites`}
+          aria-label={isFavorite
+            ? t('product.removeFromFavorites', { name: product.name })
+            : t('product.saveToFavorites', { name: product.name })}
           aria-pressed={isFavorite}
         >
           <Heart className={`h-4 w-4 ${isFavorite ? 'fill-brand text-brand' : ''}`} aria-hidden="true" />
         </button>
         {!product.available ? (
           <span className="absolute inset-x-0 bottom-0 bg-danger/90 py-1.5 text-center text-xs font-bold uppercase tracking-wide">
-            Unavailable
+            {t('product.unavailable')}
           </span>
         ) : null}
       </div>
@@ -93,7 +97,9 @@ export default function ProductCard({ product, onOpen }) {
             disabled={!product.available}
             className="grid h-11 w-11 place-items-center rounded-full bg-brand text-white shadow-glow transition
                        hover:bg-brand-hover active:scale-95 disabled:bg-line disabled:text-ink-muted disabled:shadow-none"
-            aria-label={needsChoices ? `Choose options for ${product.name}` : `Add ${product.name} to cart`}
+            aria-label={needsChoices
+              ? t('product.chooseOptionsFor', { name: product.name })
+              : t('product.addToCartFor', { name: product.name })}
           >
             <Plus className="h-5 w-5" aria-hidden="true" />
           </button>
