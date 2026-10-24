@@ -1,0 +1,22 @@
+services:
+  web:
+    image: node:22
+    working_dir: /workspace
+    volumes:
+      - "${BASE44_PROJECT_ROOT}:/workspace"
+    ports:
+      - "3000:5173"
+    environment:
+      - BASE44_PREVIEW_MODE=1
+      - __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
+    command: ["sh", "-ec", "npm install --no-audit --no-fund && exec npm run dev"]
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          node -e "require('http').get('http://127.0.0.1:5173/',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    restart: on-failure

@@ -1,0 +1,54 @@
+:root {
+  /* Backgrounds */
+  --bg-primary: #080808;
+  --bg-secondary: #111111;
+  --bg-elevated: #191919;
+  --bg-card: #151515;
+  --bg-card-hover: #1d1d1d;
+
+  /* Borders */
+  --border: #303030;
+  --border-light: #222222;
+
+  /* Brand */
+  --orange: #FF650D;
+  --orange-hover: #FF7A1A;
+  --orange-dim: rgba(255, 101, 13, 0.15);
+  --lime: #C7F32F;
+  --lime-dim: rgba(199, 243, 47, 0.15);
+
+  /* Text */
+  --text-primary: #FFFFFF;
+  --text-secondary: #B8B8B8;
+  --text-muted: #818181;
+
+  /* Status */
+  --success: #4ADE80;
+  --error: #FF4D4F;
+  --warning: #FFC857;
+
+  /* Radius */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 24px;
+  --r-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
+  --shadow-orange: 0 4px 20px rgba(255, 101, 13, 0.3);
+
+  /* Transitions */
+  --t-fast: 150ms ease;
+  --t-med: 250ms ease;
+  --t-slow: 400ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Layout */
+  --header-h: 64px;
+  --bottom-nav-h: 68px;
+  --max-width: 1440px;
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-alt: 'Manrope', 'Inter', system-ui, sans-serif;
+}
