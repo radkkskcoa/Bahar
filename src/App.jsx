@@ -7,6 +7,7 @@ import NavDrawer from './components/NavDrawer'
 import MobileBottomNav from './components/MobileBottomNav'
 import CartDrawer from './components/CartDrawer'
 import ProductDetailModal from './components/ProductDetailModal'
+import ScrollToTop from './components/ScrollToTop'
 import Footer from './components/Footer'
 import Home from './pages/Home'
 import Menu from './pages/Menu'
@@ -16,6 +17,8 @@ import OrderTracking from './pages/OrderTracking'
 import Profile from './pages/Profile'
 import Rewards from './pages/Rewards'
 import About from './pages/About'
+import Notifications from './pages/Notifications'
+import NotFound from './pages/NotFound'
 import { getProductById } from './data/menu'
 import './styles/components.css'
 
@@ -75,6 +78,8 @@ function AppContent() {
           } />
           <Route path="/rewards" element={<Rewards />} />
           <Route path="/about" element={<About />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
 
@@ -91,6 +96,7 @@ export default function App() {
     <BrowserRouter>
       <ToastProvider>
         <CartProvider>
+          <ScrollToTop />
           <AppContent />
         </CartProvider>
       </ToastProvider>

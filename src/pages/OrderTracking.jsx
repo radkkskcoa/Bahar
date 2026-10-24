@@ -1,10 +1,18 @@
+import { useState, useEffect } from 'react'
 import { Check, ChefHat, Scooter, Home as HomeIcon, Phone, ArrowRight } from '../components/Icons'
 import { sampleOrders, orderStatuses } from '../data/menu'
 import { useNavigate } from 'react-router-dom'
 
 export default function OrderTracking() {
   const navigate = useNavigate()
-  const order = sampleOrders[0]
+  const [order, setOrder] = useState(sampleOrders[0])
+
+  useEffect(() => {
+    try {
+      const lastOrder = localStorage.getItem('crunch-house-last-order')
+      if (lastOrder) setOrder(JSON.parse(lastOrder))
+    } catch {}
+  }, [])
 
   if (!order) {
     return (

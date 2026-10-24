@@ -8,7 +8,7 @@ import { Check, ArrowRight, ArrowLeft } from '../components/Icons'
 const steps = ['Contact', 'Delivery', 'Fulfillment', 'Payment', 'Confirmation']
 
 export default function Checkout() {
-  const { items, count, subtotal, clearCart } = useCart()
+  const { items, count, subtotal, discount, clearCart, clearCoupon } = useCart()
   const { showToast } = useToast()
   const navigate = useNavigate()
   const [step, setStep] = useState(0)
@@ -22,8 +22,9 @@ export default function Checkout() {
 
   const deliveryFee = fulfillment === 'delivery' && subtotal < businessSettings.freeDeliveryThreshold
     ? businessSettings.deliveryFee : 0
-  const tax = subtotal * businessSettings.taxRate
-  const total = subtotal + deliveryFee + tax
+  const taxedAmount = Math.max(0, subtotal - discount)
+  const tax = taxedAmount * businessSettings.taxRate
+  const total = taxedAmount + deliveryFee + tax
 
   if (count === 0 && !orderConfirmed) {
     return (
@@ -90,10 +91,25 @@ export default function Checkout() {
     if (step === 3) {
       // Place order
       const orderNum = `CH-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(Math.random() * 900 + 100)}`
+      // Persist order for tracking
+      try {
+        const order = {
+          id: orderNum,
+          status: 'preparing',
+          eta: fulfillment === 'delivery' ? '25-35 min' : '15-20 min',
+          items: items.map((i) => ({ name: i.name, qty: i.qty, price: i.unitPrice })),
+          total: parseFloat(total.toFixed(2)),
+          placedAt: new Date().toISOString(),
+          address: fulfillment === 'delivery' ? `${form.address}${form.apt ? `, ${form.apt}` : ''}` : 'Pickup',
+          fulfillment,
+          customer: { name: form.name, email: form.email, phone: form.phone },
+        }
+        localStorage.setItem('crunch-house-last-order', JSON.stringify(order))
+      } catch {}
       setOrderConfirmed(orderNum)
       showToast('Order placed successfully!')
       // Don't clear cart yet — show summary first, clear on navigation
-      setTimeout(() => clearCart(), 100)
+      setTimeout(() => { clearCart(); clearCoupon() }, 100)
     } else {
       setStep(step + 1)
     }
@@ -222,6 +238,7 @@ export default function Checkout() {
           ))}
           <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border-light)' }}>
             <div className="checkout-summary-item"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
+            {discount > 0 && <div className="checkout-summary-item" style={{ color: 'var(--success)' }}><span>Discount</span><span>-${discount.toFixed(2)}</span></div>}
             <div className="checkout-summary-item"><span>Delivery</span><span>{deliveryFee === 0 ? 'FREE' : `$${deliveryFee.toFixed(2)}`}</span></div>
             <div className="checkout-summary-item"><span>Tax</span><span>${tax.toFixed(2)}</span></div>
             <div className="checkout-summary-item" style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '1.1rem', marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border-light)' }}>

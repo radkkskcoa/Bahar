@@ -13,6 +13,8 @@ export function CartProvider({ children }) {
   })
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [cartBump, setCartBump] = useState(false)
+  const [couponCode, setCouponCode] = useState('')
+  const [discount, setDiscount] = useState(0)
   const bumpTimer = useRef(null)
 
   useEffect(() => {
@@ -53,15 +55,29 @@ export function CartProvider({ children }) {
     )
   }, [])
 
-  const clearCart = useCallback(() => setItems([]), [])
+  const clearCart = useCallback(() => {
+    setItems([])
+    setCouponCode('')
+    setDiscount(0)
+  }, [])
+
+  const applyCoupon = useCallback((code, amount) => {
+    setCouponCode(code)
+    setDiscount(amount)
+  }, [])
+
+  const clearCoupon = useCallback(() => {
+    setCouponCode('')
+    setDiscount(0)
+  }, [])
 
   const count = items.reduce((sum, i) => sum + i.qty, 0)
   const subtotal = items.reduce((sum, i) => sum + i.unitPrice * i.qty, 0)
 
   return (
     <CartContext.Provider value={{
-      items, count, subtotal,
-      addItem, removeItem, updateQty, clearCart,
+      items, count, subtotal, discount, couponCode,
+      addItem, removeItem, updateQty, clearCart, applyCoupon, clearCoupon,
       isCartOpen, setIsCartOpen, cartBump,
     }}>
       {children}

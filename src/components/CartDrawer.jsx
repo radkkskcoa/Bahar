@@ -6,28 +6,33 @@ import { useNavigate } from 'react-router-dom'
 import { businessSettings, promotions } from '../data/menu'
 
 export default function CartDrawer() {
-  const { items, count, subtotal, removeItem, updateQty, clearCart, isCartOpen, setIsCartOpen } = useCart()
+  const { items, count, subtotal, discount, couponCode, removeItem, updateQty, clearCart, applyCoupon: applyCouponCtx, clearCoupon, isCartOpen, setIsCartOpen } = useCart()
   const { showToast } = useToast()
   const navigate = useNavigate()
-  const [coupon, setCoupon] = useState('')
-  const [appliedDiscount, setAppliedDiscount] = useState(0)
+  const [coupon, setCoupon] = useState(couponCode || '')
 
   if (!isCartOpen) return null
 
   const deliveryFee = subtotal >= businessSettings.freeDeliveryThreshold ? 0 : businessSettings.deliveryFee
-  const discount = appliedDiscount
   const tax = Math.max(0, (subtotal - discount) * businessSettings.taxRate)
   const total = Math.max(0, subtotal - discount + deliveryFee + tax)
 
-  const applyCoupon = () => {
+  const handleApplyCoupon = () => {
     const promo = promotions.find((p) => p.code?.toLowerCase() === coupon.trim().toLowerCase() && p.active)
     if (promo) {
-      setAppliedDiscount((subtotal * promo.discount) / 100)
+      const amount = (subtotal * promo.discount) / 100
+      applyCouponCtx(promo.code, amount)
       showToast(`Coupon applied: ${promo.discount}% off!`)
     } else {
       showToast('Invalid or expired coupon code', 'error')
-      setAppliedDiscount(0)
+      clearCoupon()
     }
+  }
+
+  const handleRemoveCoupon = () => {
+    clearCoupon()
+    setCoupon('')
+    showToast('Coupon removed')
   }
 
   const handleCheckout = () => {
@@ -79,8 +84,17 @@ export default function CartDrawer() {
 
             <div className="cart-footer">
               <div className="cart-coupon">
-                <input type="text" placeholder="Coupon code" value={coupon} onChange={(e) => setCoupon(e.target.value)} aria-label="Coupon code" />
-                <button className="cart-coupon-btn" onClick={applyCoupon}>Apply</button>
+                {couponCode ? (
+                  <div className="cart-coupon-applied">
+                    <span className="cart-coupon-tag">✓ {couponCode}</span>
+                    <button className="cart-coupon-remove" onClick={handleRemoveCoupon} aria-label="Remove coupon"><X size={14} /></button>
+                  </div>
+                ) : (
+                  <>
+                    <input type="text" placeholder="Coupon code" value={coupon} onChange={(e) => setCoupon(e.target.value)} aria-label="Coupon code" />
+                    <button className="cart-coupon-btn" onClick={handleApplyCoupon}>Apply</button>
+                  </>
+                )}
               </div>
               <div className="cart-summary-row"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
               {discount > 0 && <div className="cart-summary-row" style={{ color: 'var(--success)' }}><span>Discount</span><span>-${discount.toFixed(2)}</span></div>}
